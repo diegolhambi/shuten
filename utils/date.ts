@@ -22,7 +22,6 @@ export function hoursDiff(timeEarlier: string, timeLater: string): string {
 }
 
 export function getWeekdays(format: 'long' | 'short' | 'narrow' = 'narrow') {
-
     const weekdays: { [key in Weekday]: string } = {
         1: 'M',
         2: 'T',
