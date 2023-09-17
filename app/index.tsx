@@ -1,34 +1,295 @@
-import { SplashScreen } from 'expo-router';
-import { StyleSheet, Text, View } from 'react-native';
+import { Clock, MailCheck, MoreVertical } from '@tamagui/lucide-icons';
+import { useToastController } from '@tamagui/toast';
+import * as NavigationBar from 'expo-navigation-bar';
+import { router, SplashScreen, useFocusEffect } from 'expo-router';
+import { ResultSet, SQLError } from 'expo-sqlite';
+import * as SystemUI from 'expo-system-ui';
+import { DateTime } from 'luxon';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { FlatList, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { Button, Input, styled, useTheme, XStack } from 'tamagui';
+
+import { BottomBar } from '../components/bottom-bar';
+import Date from '../components/clock';
+import Menu from '../components/menu';
+import { PunchButton } from '../components/punch-button';
+import PunchItem from '../components/punch-item';
+import ConfigContext from '../providers/config';
+import DatabaseContext from '../providers/database';
+import NotificationContext from '../providers/notification-manager';
+import { Punch } from '../types/punch';
+import { days, getDayPunches, indexToday } from '../utils/punch-list';
+
+const PUNCHES = new Map<string, Punch[]>();
+
+const AreaView = styled(SafeAreaView, {
+    name: 'HomeAreaView',
+    flex: 1,
+    edges: ['top', 'right', 'left'],
+    backgroundColor: '$backgroundStrong',
+});
+
+const BottomAreaView = styled(SafeAreaView, {
+    name: 'HomeBottomAreaView',
+    edges: ['bottom'],
+    backgroundColor: '$backgroundHover',
+});
 
 export default function Home() {
-    function onLayout() {
-        SplashScreen.hideAsync();
+    const theme = useTheme();
+    const { config } = useContext(ConfigContext);
+    const { db } = useContext(DatabaseContext);
+    const notification = useContext(NotificationContext);
+    const toast = useToastController();
+
+    const [today, setToday] = useState(DateTime.now());
+    const [todayIso, setTodayIso] = useState(
+        DateTime.now().toISODate() as string,
+    );
+    const [fetchedPunches, setFetchedPunches] = useState(0);
+    const [openMenu, setOpenMenu] = useState(false);
+    const [devMode, setDevMode] = useState(__DEV__);
+    const [devDate, setDevDate] = useState<string | undefined>(undefined);
+
+    const data = useMemo(days, []);
+    const initialIndex = useMemo(() => {
+        const index = indexToday() - 3;
+
+        return index < 0 ? 0 : index;
+    }, []);
+
+    useEffect(() => {
+        const timer = setInterval(() => {
+            setToday(DateTime.now());
+            setTodayIso(DateTime.now().toISODate() as string);
+        }, 21600000);
+
+        return () => clearInterval(timer);
+    }, []);
+
+    useEffect(() => {
+        if (devMode === false) {
+            setDevDate(undefined);
+            return;
+        }
+
+        setDevDate(DateTime.now().toFormat('yyyy-MM-dd HH:mm'));
+    }, [devMode]);
+
+    useFocusEffect(
+        useCallback(() => {
+            notification.requestPermission().then((granted) => {
+                if (granted) {
+                    notification.scheduleFirstPunch();
+                }
+            });
+
+            SystemUI.setBackgroundColorAsync(theme.background.val);
+
+            if (Platform.OS !== 'android') {
+                return;
+            }
+
+            NavigationBar.setBackgroundColorAsync(theme.backgroundHover.val);
+        }, []),
+    );
+
+    const getPunches = useCallback(getDayPunches(PUNCHES, config), [
+        config,
+        fetchedPunches,
+    ]);
+
+    function renderItem({ item }: { item: string }) {
+        return (
+            <PunchItem
+                day={item}
+                today={todayIso}
+                fetchedPunches={fetchedPunches}
+                getPunches={getPunches}
+            />
+        );
     }
+
+    function keyExtractor(item: string) {
+        return `punch-${item}`;
+    }
+
+    function getItemLayout(_: any, index: number) {
+        return {
+            length: 87,
+            offset: 87 * index,
+            index,
+        };
+    }
+
+    const bgButtonPunch = useMemo(() => {
+        if (config.hoursToWork[today.weekday]?.punches.length === 0) {
+            return '$gray8';
+        }
+
+        if (fetchedPunches === 0) {
+            return '$gray8';
+        }
+
+        const punches = PUNCHES.get(today.toFormat('yyyy-LL-dd')) || [];
+
+        if (punches.length % 2 === 0) {
+            return '$red8';
+        }
+
+        return '$green8';
+    }, [fetchedPunches, config]);
+
+    async function databasePunches() {
+        PUNCHES.clear();
+
+        return db.transactionAsync(async (tx) => {
+            const result = (await tx.executeSqlAsync(
+                `select 
+                    DATE(date) as date,
+                    strftime('%H:%M', date) as time,
+                    type
+                from punches`,
+            )) as ResultSet;
+
+            for (const item of result.rows) {
+                if (PUNCHES.has(item.date)) {
+                    const old = PUNCHES.get(item.date) || [];
+                    old.push({ time: item.time, type: item.type });
+                    PUNCHES.set(item.date, old);
+                    continue;
+                }
+
+                PUNCHES.set(item.date, [{ time: item.time, type: item.type }]);
+            }
+
+            setFetchedPunches(DateTime.now().toUnixInteger());
+        }, true);
+    }
+
+    useEffect(() => {
+        databasePunches();
+    }, []);
+
+    async function insertPunch(dateTime?: string) {
+        db.transaction(
+            (tx) => {
+                const value =
+                    dateTime || DateTime.now().toFormat('yyyy-LL-dd HH:mm');
+
+                tx.executeSql("INSERT INTO punches VALUES (?, 'punch');", [
+                    value,
+                ]);
+            },
+            (error: SQLError) => {
+                if (
+                    error.message.includes(
+                        'UNIQUE constraint failed: punches.date',
+                    )
+                ) {
+                    toast.show('Duplicate entry detected', {
+                        message: "You've already added a punch at this time.",
+                    });
+                } else {
+                    toast.show('Something went wrong', {
+                        message: error.message,
+                    });
+                }
+            },
+            async () => {
+                await databasePunches();
+                notification.scheduleNext(
+                    getPunches(today.toFormat('yyyy-LL-dd')),
+                );
+            },
+        );
+    }
+
     return (
-        <View
-            onLayout={onLayout}
-            style={styles.container}
-        >
-            <Text style={styles.title}>Tab One</Text>
-        </View>
+        <AreaView onLayout={() => SplashScreen.hideAsync()}>
+            <FlatList
+                data={data}
+                initialNumToRender={15}
+                initialScrollIndex={initialIndex}
+                renderItem={renderItem}
+                keyExtractor={keyExtractor}
+                getItemLayout={getItemLayout}
+            />
+            <BottomBar>
+                <XStack flexGrow={1}>
+                    <Button
+                        onPress={() => setOpenMenu(true)}
+                        chromeless
+                        px="$3"
+                        icon={<MoreVertical size="$1.5" />}
+                    />
+                </XStack>
+                {devMode ? (
+                    <XStack
+                        space="$1"
+                        alignItems="center"
+                    >
+                        <Button
+                            size="$2"
+                            icon={<MailCheck />}
+                            onPress={() => {
+                                toast.show('Not implemented yet');
+                                router.push('/config');
+                            }}
+                        />
+                        <Button
+                            size="$2"
+                            icon={<Clock />}
+                            onPress={() =>
+                                setDevDate(
+                                    DateTime.now().toFormat('yyyy-MM-dd HH:mm'),
+                                )
+                            }
+                        />
+                        <Input
+                            placeholder="yyyy-LL-dd HH:mm"
+                            value={devDate}
+                            onChangeText={(text) => setDevDate(text)}
+                        />
+                    </XStack>
+                ) : (
+                    <Date />
+                )}
+                <PunchButton
+                    onLongPress={() => {
+                        insertPunch(devDate || undefined);
+                    }}
+                    backgroundColor={bgButtonPunch}
+                />
+            </BottomBar>
+            <BottomAreaView />
+            <Menu
+                open={openMenu}
+                onOpenChange={setOpenMenu}
+            >
+                <Menu.Item onPress={() => {}}>Add punch</Menu.Item>
+                {devMode ? (
+                    <Menu.Item
+                        onPress={() => {
+                            db.transaction((tx) =>
+                                tx.executeSql('DELETE FROM punches'),
+                            );
+                            databasePunches();
+                        }}
+                    >
+                        Nuke DB
+                    </Menu.Item>
+                ) : null}
+                <Menu.Item
+                    onPress={() => {}}
+                    onLongPress={() => {
+                        setDevMode(!devMode);
+                    }}
+                >
+                    Settings
+                </Menu.Item>
+            </Menu>
+        </AreaView>
     );
 }
-
-const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
-    title: {
-        fontSize: 20,
-        fontWeight: 'bold',
-        color: 'white',
-    },
-    separator: {
-        marginVertical: 30,
-        height: 1,
-        width: '80%',
-    },
-});
