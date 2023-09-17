@@ -14,6 +14,7 @@
         "preset": "jest-expo"
     },
     "dependencies": {
+        "@react-native-async-storage/async-storage": "1.18.2",
         "@react-navigation/native": "^6.0.2",
         "@tamagui/animations-react-native": "^1.68.0",
         "@tamagui/font-inter": "^1.68.0",
@@ -26,8 +27,11 @@
         "expo": "~49.0.11",
         "expo-font": "~11.4.0",
         "expo-linking": "~5.0.2",
+        "expo-localization": "~14.3.0",
+        "expo-notifications": "~0.20.1",
         "expo-router": "^2.0.0",
         "expo-splash-screen": "~0.20.5",
+        "expo-sqlite": "~11.3.3",
         "expo-status-bar": "~1.6.0",
         "expo-system-ui": "~2.4.0",
         "expo-web-browser": "~12.3.2",
