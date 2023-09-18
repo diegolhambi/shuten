@@ -43,6 +43,15 @@
         ],
         "experiments": {
             "typedRoutes": true
-        }
+        },
+        "extra": {
+            "router": {
+                "origin": false
+            },
+            "eas": {
+                "projectId": "295bdb5f-694a-4c5d-a6d5-a81157ec8842"
+            }
+        },
+        "owner": "daigou"
     }
 }
