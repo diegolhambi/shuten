@@ -217,11 +217,10 @@ export default function Home() {
             async () => {
                 await databasePunches();
 
-                if (DateTime.fromFormat(value, 'yyyy-LL-dd HH:mm') > today) {
-                    notification.scheduleNext(
-                        getPunches(today.toFormat('yyyy-LL-dd')),
-                    );
-                }
+                notification.scheduleNext(
+                    value,
+                    getPunches(today.toFormat('yyyy-LL-dd')),
+                );
             },
         );
     }
@@ -288,7 +287,7 @@ export default function Home() {
                 open={openMenu}
                 onOpenChange={setOpenMenu}
             >
-                <Menu.Item onPress={() => { }}>Add punch</Menu.Item>
+                <Menu.Item onPress={() => {}}>Add punch</Menu.Item>
                 {devMode ? (
                     <Menu.Item
                         onPress={() => {
@@ -302,7 +301,7 @@ export default function Home() {
                     </Menu.Item>
                 ) : null}
                 <Menu.Item
-                    onPress={() => { }}
+                    onPress={() => {}}
                     onLongPress={() => {
                         setDevMode(!devMode);
                     }}

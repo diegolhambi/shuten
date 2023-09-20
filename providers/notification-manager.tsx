@@ -17,7 +17,7 @@ type NotificationManagerContextData = {
     granted: boolean | undefined;
     requestPermission: () => Promise<boolean>;
     scheduleFirstPunch: (punches: PunchesMap) => Promise<void>;
-    scheduleNext: (punch: Punch[]) => void;
+    scheduleNext: (time: string, punch: Punch[]) => void;
 };
 
 const NotificationContext = createContext<NotificationManagerContextData>(
@@ -158,7 +158,7 @@ export function NotificationProvider({ children }: Props) {
         }
     }
 
-    function scheduleNext(punches: Punch[]) {
+    function scheduleNext(time: string, punches: Punch[]) {
         if (!granted) {
             return;
         }
@@ -184,7 +184,7 @@ export function NotificationProvider({ children }: Props) {
             string,
         ];
 
-        let notifyTrigger = DateTime.now().set({
+        let notifyTrigger = DateTime.fromFormat(time, 'yyyy-LL-dd HH:mm').set({
             hour: +hour,
             minute: +minute,
             second: 0,
@@ -200,6 +200,7 @@ export function NotificationProvider({ children }: Props) {
                 categoryIdentifier: 'punch',
                 ...textNotications[index as 1 | 2 | 3],
             },
+            identifier: `punch_${notifyTrigger.toFormat('yyyy-MM-dd_HH-mm')}`,
             trigger: notifyTrigger.toJSDate(),
         });
     }
