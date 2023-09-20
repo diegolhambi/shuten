@@ -8,6 +8,7 @@ import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
+import { AdpProvider } from '../providers/adp';
 import { ConfigProvider } from '../providers/config';
 import { DatabaseProvider } from '../providers/database';
 import { NotificationProvider } from '../providers/notification-manager';
@@ -57,7 +58,9 @@ function RootLayoutNav() {
                 <ConfigProvider>
                     <DatabaseProvider>
                         <NotificationProvider>
-                            <Stack screenOptions={{ headerShown: false }} />
+                            <AdpProvider>
+                                <Stack screenOptions={{ headerShown: false }} />
+                            </AdpProvider>
                         </NotificationProvider>
                     </DatabaseProvider>
                 </ConfigProvider>

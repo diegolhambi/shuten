@@ -15,6 +15,7 @@ import Date from '../components/clock';
 import Menu from '../components/menu';
 import { PunchButton } from '../components/punch-button';
 import PunchItem from '../components/punch-item';
+import AdpContext from '../providers/adp';
 import ConfigContext from '../providers/config';
 import DatabaseContext from '../providers/database';
 import NotificationContext from '../providers/notification-manager';
@@ -42,6 +43,7 @@ export default function Home() {
     const theme = useTheme();
     const { config } = useContext(ConfigContext);
     const { db } = useContext(DatabaseContext);
+    const adp = useContext(AdpContext);
     const notification = useContext(NotificationContext);
     const toast = useToastController();
 
@@ -278,6 +280,9 @@ export default function Home() {
                 <PunchButton
                     onLongPress={() => {
                         insertPunch(devDate || undefined);
+                        if (!devMode) {
+                            adp.punch();
+                        }
                     }}
                     backgroundColor={bgButtonPunch}
                 />
