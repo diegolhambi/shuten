@@ -1,5 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useState } from 'react';
+import React, { createContext, useMemo, useState } from 'react';
 
 import { Weekday } from '../utils/date';
 
@@ -89,8 +89,12 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
         }
     }
 
+    const contextValue = useMemo(() => {
+        return { config, load };
+    }, [config]);
+
     return (
-        <ConfigContext.Provider value={{ config, load }}>
+        <ConfigContext.Provider value={contextValue}>
             {children}
         </ConfigContext.Provider>
     );
