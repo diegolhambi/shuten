@@ -22,6 +22,7 @@ import { Punch } from '../types/punch';
 import { days, getDayPunches, indexToday } from '../utils/punch-list';
 
 const PUNCHES = new Map<string, Punch[]>();
+export type PunchesMap = typeof PUNCHES;
 
 const AreaView = styled(SafeAreaView, {
     name: 'HomeAreaView',
@@ -77,14 +78,28 @@ export default function Home() {
         setDevDate(DateTime.now().toFormat('yyyy-MM-dd HH:mm'));
     }, [devMode]);
 
+    async function handleNotifications() {
+        const granted = await notification.requestPermission();
+
+        if (!granted) {
+            return;
+        }
+
+        await notification.scheduleFirstPunch(PUNCHES);
+    }
+
     useFocusEffect(
         useCallback(() => {
-            notification.requestPermission().then((granted) => {
-                if (granted) {
-                    notification.scheduleFirstPunch();
-                }
-            });
+            if (fetchedPunches === 0) {
+                return;
+            }
 
+            handleNotifications();
+        }, [fetchedPunches]),
+    );
+
+    useFocusEffect(
+        useCallback(() => {
             SystemUI.setBackgroundColorAsync(theme.background.val);
 
             if (Platform.OS !== 'android') {

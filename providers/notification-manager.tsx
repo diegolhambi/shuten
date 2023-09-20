@@ -8,13 +8,15 @@ import React, {
     useState,
 } from 'react';
 
+import { PunchesMap } from '../app';
 import { Punch } from '../types/punch';
+import { Weekday } from '../utils/date';
 import ConfigContext from './config';
 
 type NotificationManagerContextData = {
     granted: boolean | undefined;
     requestPermission: () => Promise<boolean>;
-    scheduleFirstPunch: () => void;
+    scheduleFirstPunch: (punches: PunchesMap) => Promise<void>;
     scheduleNext: (punch: Punch[]) => void;
 };
 
@@ -105,7 +107,7 @@ export function NotificationProvider({ children }: Props) {
         return granted;
     }
 
-    function scheduleFirstPunch() {
+    async function scheduleFirstPunch(punches: PunchesMap) {
         if (!granted) {
             return;
         }
@@ -114,34 +116,45 @@ export function NotificationProvider({ children }: Props) {
             return;
         }
 
-        for (const key in config.hoursToWork) {
-            if (config.hoursToWork.hasOwnProperty(key)) {
-                const element = config.hoursToWork[key] || {
-                    punches: [] as string[],
-                    durations: [] as string[],
-                };
+        const today = DateTime.now();
 
-                if (element.punches.length === 0) {
-                    continue;
-                }
+        let iterator = today.plus({ days: 0 });
+        for (let index = 0; index < 7; index++) {
+            const weekday = iterator.weekday as Weekday;
+            if (!config.hoursToWork[weekday].punches.length) {
+                iterator = iterator.plus({ days: 1 });
+                continue;
+            }
 
-                const [hour, minute] = (element.punches[0] as string).split(
-                    ':',
-                ) as [string, string];
+            if (punches.get(iterator.toFormat('yyyy-MM-dd'))?.length) {
+                iterator = iterator.plus({ days: 1 });
+                continue;
+            }
 
-                Notifications.scheduleNotificationAsync({
+            const [hour, minute] =
+                config.hoursToWork[weekday].punches[0]!.split(':');
+
+            const notifyTrigger = iterator.set({
+                hour: +hour!,
+                minute: +minute!,
+                second: 0,
+                millisecond: 0,
+            });
+
+            if (today < notifyTrigger) {
+                await Notifications.scheduleNotificationAsync({
                     content: {
                         categoryIdentifier: 'punch',
                         ...textNotications[0],
                     },
-                    trigger: {
-                        repeats: true,
-                        weekday: +key,
-                        hour: +hour,
-                        minute: +minute,
-                    },
+                    identifier: `punch_${notifyTrigger.toFormat(
+                        'yyyy-MM-dd_HH-mm',
+                    )}`,
+                    trigger: notifyTrigger.toJSDate(),
                 });
             }
+
+            iterator = iterator.plus({ days: 1 });
         }
     }
 
