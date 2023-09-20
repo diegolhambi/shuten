@@ -19,6 +19,7 @@ import ConfigContext from '../providers/config';
 import DatabaseContext from '../providers/database';
 import NotificationContext from '../providers/notification-manager';
 import { Punch } from '../types/punch';
+import { Weekday } from '../utils/date';
 import { days, getDayPunches, indexToday } from '../utils/punch-list';
 
 const PUNCHES = new Map<string, Punch[]>();
@@ -139,7 +140,9 @@ export default function Home() {
     }
 
     const bgButtonPunch = useMemo(() => {
-        if (config.hoursToWork[today.weekday]?.punches.length === 0) {
+        if (
+            config.hoursToWork[today.weekday as Weekday]?.punches.length === 0
+        ) {
             return '$gray8';
         }
 
@@ -188,11 +191,10 @@ export default function Home() {
     }, []);
 
     async function insertPunch(dateTime?: string) {
+        const value = dateTime || DateTime.now().toFormat('yyyy-LL-dd HH:mm');
+
         db.transaction(
             (tx) => {
-                const value =
-                    dateTime || DateTime.now().toFormat('yyyy-LL-dd HH:mm');
-
                 tx.executeSql("INSERT INTO punches VALUES (?, 'punch');", [
                     value,
                 ]);
@@ -214,9 +216,12 @@ export default function Home() {
             },
             async () => {
                 await databasePunches();
-                notification.scheduleNext(
-                    getPunches(today.toFormat('yyyy-LL-dd')),
-                );
+
+                if (DateTime.fromFormat(value, 'yyyy-LL-dd HH:mm') > today) {
+                    notification.scheduleNext(
+                        getPunches(today.toFormat('yyyy-LL-dd')),
+                    );
+                }
             },
         );
     }
@@ -283,7 +288,7 @@ export default function Home() {
                 open={openMenu}
                 onOpenChange={setOpenMenu}
             >
-                <Menu.Item onPress={() => {}}>Add punch</Menu.Item>
+                <Menu.Item onPress={() => { }}>Add punch</Menu.Item>
                 {devMode ? (
                     <Menu.Item
                         onPress={() => {
@@ -297,7 +302,7 @@ export default function Home() {
                     </Menu.Item>
                 ) : null}
                 <Menu.Item
-                    onPress={() => {}}
+                    onPress={() => { }}
                     onLongPress={() => {
                         setDevMode(!devMode);
                     }}

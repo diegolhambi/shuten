@@ -1,6 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useState } from 'react';
 
+import { Weekday } from '../utils/date';
+
 export type HoursToWork = {
     punches: string[];
     durations: string[];
@@ -9,7 +11,7 @@ export type HoursToWork = {
 export type Config = {
     firstDayOfMonth: number;
     hoursToWork: {
-        [key: number]: HoursToWork;
+        [key in Weekday]: HoursToWork;
     };
     durations: {
         lunch: string;
