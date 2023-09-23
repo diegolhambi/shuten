@@ -1,11 +1,11 @@
 import { getVariableValue, SizeTokens, styled } from '@tamagui/core';
 import { getSize } from '@tamagui/get-token';
 import { ThemeableStack, YStack } from '@tamagui/stacks';
-import { createSwitch, SwitchContext } from '@tamagui/switch';
+import { createSwitch } from '@tamagui/switch';
 
 const SwitchThumb = styled(ThemeableStack, {
     name: 'SwitchThumb',
-    context: SwitchContext,
+    animation: 'quick',
 
     variants: {
         unstyled: {
@@ -40,7 +40,6 @@ const getSwitchWidth = (val: SizeTokens) => getSwitchHeight(val) * 2;
 const SwitchFrame = styled(YStack, {
     name: 'Switch',
     tag: 'button',
-    context: SwitchContext,
 
     variants: {
         unstyled: {
@@ -61,7 +60,9 @@ const SwitchFrame = styled(YStack, {
         },
 
         checked: {
-            true: {},
+            true: {
+                backgroundColor: '$green7',
+            },
         },
 
         frameWidth: {
