@@ -1,14 +1,27 @@
 import { useToastController } from '@tamagui/toast';
-import axios, { AxiosInstance } from 'axios';
-import { wrapper } from 'axios-cookiejar-support';
+import axios, { RawAxiosRequestHeaders } from 'axios';
 import { DateTime } from 'luxon';
 import qs from 'qs';
-import React, { createContext, useEffect, useMemo, useState } from 'react';
-import { CookieJar } from 'tough-cookie';
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useMemo,
+    useRef,
+    useState,
+} from 'react';
+
+import { storage } from '../utils/storage';
+import ConfigContext from './config';
 
 type AdpContextData = {
-    login(): Promise<AxiosInstance | undefined>;
+    login(user: string, password: string): Promise<LoginResult>;
     punch(): Promise<void>;
+};
+
+type AdpSessionId = {
+    expires_at: number;
+    value: string;
 };
 
 const AdpContext = createContext<AdpContextData>({} as AdpContextData);
@@ -17,111 +30,205 @@ type Props = {
     children?: React.ReactNode;
 };
 
-async function login() {
-    const jar = new CookieJar();
-    const http = wrapper(
-        axios.create({
-            jar,
-            headers: {
-                'Accept-Language': 'pt-BR,pt;q=0.9',
-                'Cache-Control': 'max-age=0',
-            },
-            timeout: 3000,
-            withCredentials: true,
-        }),
-    );
+type LoginResult =
+    | 'Success'
+    | 'Error'
+    | 'InvalidCredentials'
+    | 'SessionIdNotFound';
 
-    // o retorno daqui talvez possa indicar se precisa mudar de senha
-    // loginform.fcc 302 >
-    // GET https://expert.brasil.adp.com/redirect/findway/ 302 >
-    // GET https://expert.brasil.adp.com/expert/ 302 >
-    // GET https://expert.brasil.adp.com/expert/v4/?lp=true 200
-    await http.post(
-        'https://expert.brasil.adp.com/ipclogin/1/loginform.fcc',
-        qs.stringify({
-            USER: 'user',
-            PASSWORD: 'password',
-            TARGET: '-SM-https%3A%2F%2Fexpert.brasil.adp.com%2Fexpert%2Fv4%2F',
-        }),
-    );
+const defaultHeaders: RawAxiosRequestHeaders = {
+    'Accept-Language': 'pt-BR,pt;q=0.9',
+    'Cache-Control': 'max-age=0',
+};
+const client = axios.create({
+    baseURL: 'https://expert.brasil.adp.com/expert/api/',
+    headers: defaultHeaders,
+    timeout: 3000,
+    withCredentials: true,
+});
 
-    const htmlSessionId = await http.get<string>(
-        'https://expert.brasil.adp.com/expert/v4/',
-    );
+function loggedHeader(sessionId: string) {
+    return {
+        ...defaultHeaders,
+        Newexpert_sessionid: sessionId,
+        Origin: 'https://expert.brasil.adp.com',
+        Referer: 'https://expert.brasil.adp.com/expert/v4/?lp=true',
+    };
+}
 
-    const regexPattern =
-        /<input\s+id="newexpert_sessionid"\s+type="hidden"\s+value="([^"]+)"/;
-    const match = regexPattern.exec(htmlSessionId.data);
-
-    if (match && match.length > 1) {
-        const sessionId = match[1];
-        jar.setCookie(
-            `spsession=${sessionId}; path=/`,
-            'https://expert.brasil.adp.com/expert/v4/',
+async function login(user: string, password: string): Promise<LoginResult> {
+    try {
+        // o retorno daqui talvez possa indicar se precisa mudar de senha
+        // loginform.fcc 302 >
+        // GET https://expert.brasil.adp.com/redirect/findway/ 302 >
+        // GET https://expert.brasil.adp.com/expert/ 302 >
+        // GET https://expert.brasil.adp.com/expert/v4/?lp=true 200
+        const htmlLogin = await client.post<string>(
+            'https://expert.brasil.adp.com/ipclogin/1/loginform.fcc',
+            qs.stringify({
+                USER: user,
+                PASSWORD: password,
+                TARGET: '-SM-https%3A%2F%2Fexpert.brasil.adp.com%2Fredirect%2Ffindway%2F',
+            }),
         );
+        /*
+        console.log(htmlLogin.headers);
 
-        http.defaults.headers.common = {
-            ...http.defaults.headers.common,
-            newexpert_sessionid: sessionId,
-        };
-
-        http.defaults.params = {
-            lp: 'true',
-        };
-
-        http.defaults.baseURL = 'https://expert.brasil.adp.com/expert/api/';
-
-        return http;
-    } else {
-        const incorrectPassword = htmlSessionId.data.indexOf(
-            'Por favor, corrija suas credenciais de login e tente novamente',
+        console.log(
+            htmlLogin.data
+                .replace(/<head>[\s\S]*<\/head>/gi, '')
+                .replace(
+                    /<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi,
+                    '',
+                )
+                .replace(/<nav\b[^<]*(?:(?!<\/nav>)<[^<]*)*<\/nav>/gi, ''),
         );
-
-        if (incorrectPassword !== -1) {
-            console.log('Incorrect password');
-        } else {
-            console.log('Value not found');
+        */
+        if (
+            htmlLogin.data.indexOf(
+                'Por favor, corrija suas credenciais de login e tente novamente',
+            ) !== -1 ||
+            htmlLogin.headers['content-location'] === 'loginform.html.pt-br'
+        ) {
+            return 'InvalidCredentials';
         }
+
+        const regexPattern =
+            /<input\s+id="newexpert_sessionid"\s+type="hidden"\s+value="([^"]+)"/;
+        const match = regexPattern.exec(htmlLogin.data);
+
+        if (match && match.length > 1) {
+            const sessionId = match[1]!;
+
+            client.defaults.headers.common = {
+                ...defaultHeaders,
+                Newexpert_sessionid: sessionId,
+                Origin: 'https://expert.brasil.adp.com',
+                Referer: 'https://expert.brasil.adp.com/expert/v4/?lp=true',
+            };
+
+            client.defaults.params = {
+                lp: 'true',
+            };
+
+            const adp_session_id: AdpSessionId = {
+                expires_at: DateTime.now().plus({ hours: 2 }).toUnixInteger(),
+                value: sessionId,
+            };
+
+            storage.set('adp_session_id', JSON.stringify(adp_session_id));
+
+            return 'Success';
+        } else {
+            client.defaults.params = {};
+            client.defaults.headers.common = { ...defaultHeaders };
+            return 'SessionIdNotFound';
+        }
+    } catch (error) {
+        client.defaults.params = {};
+        client.defaults.headers.common = { ...defaultHeaders };
+        console.log('Adp login error', error);
+        return 'Error';
     }
 }
 
 export function AdpProvider({ children }: Props) {
+    const { config } = useContext(ConfigContext);
     const toast = useToastController();
 
-    const [http, setHttp] = useState<AxiosInstance | undefined>();
+    const [logged, setLogged] = useState(false);
+
+    const initialized = useRef(false);
+
+    function warmUp() {
+        const initial = DateTime.now().toMillis();
+        setLogged(false);
+
+        login(config.adp.user, config.adp.password).then((result) => {
+            const time = DateTime.now().toMillis() - initial;
+
+            switch (result) {
+                case 'Success':
+                    toast.show(`Logged in ADP in ${time}ms`);
+                    setLogged(true);
+                    break;
+                case 'InvalidCredentials':
+                    toast.show('Invalid credentials');
+                    break;
+                case 'SessionIdNotFound':
+                    toast.show('Session ID not found');
+                    break;
+                default:
+                    toast.show('Error');
+                    break;
+            }
+        });
+    }
 
     useEffect(() => {
+        if (config.adp.activated === false) {
+            return;
+        }
+
+        if (config.adp.user === '' || config.adp.password === '') {
+            return;
+        }
+
+        if (initialized.current) {
+            return;
+        }
+
+        initialized.current = true;
+
         const initial = DateTime.now().toMillis();
 
-        login().then((http) => {
-            setHttp(http);
+        const value = storage.getString('adp_session_id');
 
-            toast.show(
-                'Logged in ADP in ' +
-                    (DateTime.now().toMillis() - initial) +
-                    'ms',
-            );
+        if (!value) {
+            warmUp();
+            return;
+        }
+
+        const parsed: AdpSessionId = JSON.parse(value);
+
+        if (DateTime.now().toUnixInteger() > parsed.expires_at) {
+            warmUp();
+            return;
+        }
+
+        client.defaults.headers.common = {
+            ...loggedHeader(parsed.value),
+        };
+
+        client.defaults.params = {
+            lp: 'true',
+        };
+
+        toast.show('Client rehydrated', {
+            message: `In ${DateTime.now().toMillis() - initial}ms`,
         });
-    }, []);
+
+        setLogged(true);
+    }, [config]);
 
     async function punch() {
-        if (!http) {
-            toast.show('Not logged in');
+        if (!client) {
+            toast.show('Punch not registered in ADP');
             return;
         }
 
         try {
             const initial = DateTime.now().toMillis();
-            await http.post('punch/punchin', {
-                punchType: 'SPDesktop',
+            await client.post('punch/punchin', {
+                punchType: 'SPMobile',
                 punchLatitude: null,
                 punchLongitude: null,
                 punchAction: null,
             });
 
-            toast.show(
-                'Punched in in ' + (DateTime.now().toMillis() - initial) + 'ms',
-            );
+            toast.show('Punched in', {
+                message: `In ${DateTime.now().toMillis() - initial}ms`,
+            });
         } catch (error) {
             toast.show('Error', {
                 message: JSON.stringify(error),
@@ -134,7 +241,7 @@ export function AdpProvider({ children }: Props) {
             login,
             punch,
         };
-    }, []);
+    }, [config.adp.activated, logged]);
 
     return (
         <AdpContext.Provider value={contextValue}>

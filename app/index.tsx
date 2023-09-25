@@ -256,7 +256,6 @@ export default function Home() {
                             icon={<MailCheck />}
                             onPress={() => {
                                 toast.show('Not implemented yet');
-                                router.push('/config');
                             }}
                         />
                         <Button
@@ -292,7 +291,13 @@ export default function Home() {
                 open={openMenu}
                 onOpenChange={setOpenMenu}
             >
-                <Menu.Item onPress={() => {}}>Add punch</Menu.Item>
+                <Menu.Item
+                    onPress={() => {
+                        toast.show('To do');
+                    }}
+                >
+                    Add punch
+                </Menu.Item>
                 {devMode ? (
                     <Menu.Item
                         onPress={() => {
@@ -306,7 +311,9 @@ export default function Home() {
                     </Menu.Item>
                 ) : null}
                 <Menu.Item
-                    onPress={() => {}}
+                    onPress={() => {
+                        router.push('/settings');
+                    }}
                     onLongPress={() => {
                         setDevMode(!devMode);
                     }}
