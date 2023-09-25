@@ -84,7 +84,7 @@ export default function Home() {
     async function handleNotifications() {
         const granted = await notification.requestPermission();
 
-        if (!granted) {
+        if (!granted && !devMode) {
             return;
         }
 
