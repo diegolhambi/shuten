@@ -1,11 +1,21 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import React, { createContext, useMemo, useState } from 'react';
+import React, { createContext, useEffect, useMemo, useState } from 'react';
 
 import { Weekday } from '../utils/date';
+import { storage } from '../utils/storage';
 
 export type HoursToWork = {
     punches: string[];
     durations: string[];
+};
+
+type NotificationConfig = {
+    activated: boolean;
+};
+
+type AdpConfig = {
+    activated: boolean;
+    user: string;
+    password: string;
 };
 
 export type Config = {
@@ -13,12 +23,14 @@ export type Config = {
     hoursToWork: {
         [key in Weekday]: HoursToWork;
     };
-    durations: {
+    duration: {
         lunch: string;
         maxLunch: string;
         maxShift: string;
         maxWork: string;
     };
+    notification: NotificationConfig;
+    adp: AdpConfig;
 };
 
 const defaultConfig: Config = {
@@ -47,16 +59,25 @@ const defaultConfig: Config = {
         6: { punches: [], durations: [] },
         7: { punches: [], durations: [] },
     },
-    durations: {
+    duration: {
         lunch: 'PT1H10M',
         maxLunch: 'PT2H',
         maxShift: 'PT6H',
         maxWork: 'PT10H',
     },
+    notification: {
+        activated: false,
+    },
+    adp: {
+        activated: false,
+        user: '',
+        password: '',
+    },
 };
 
 type ConfigContextData = {
     config: Config;
+    setConfig: (config: Config) => void;
     load(): Promise<void>;
 };
 
@@ -69,17 +90,16 @@ type ConfigProviderProps = {
 export function ConfigProvider({ children }: ConfigProviderProps) {
     const [config, setConfig] = useState<Config>(defaultConfig);
 
+    useEffect(() => {
+        load();
+    }, []);
+
     async function load() {
         try {
-            // TODO: Remove this after testing
-            await AsyncStorage.setItem('config', JSON.stringify(defaultConfig));
-            const jsonValue = await AsyncStorage.getItem('config');
+            const jsonValue = storage.getString('config');
 
-            if (jsonValue == null) {
-                await AsyncStorage.setItem(
-                    'config',
-                    JSON.stringify(defaultConfig),
-                );
+            if (!jsonValue) {
+                storage.set('config', JSON.stringify(defaultConfig));
                 return;
             }
 
@@ -89,9 +109,15 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
         }
     }
 
-    const contextValue = useMemo(() => {
-        return { config, load };
-    }, [config]);
+    function updateConfig(newConfig: Config) {
+        setConfig(newConfig);
+        storage.set('config', JSON.stringify(newConfig));
+    }
+
+    const contextValue = useMemo(
+        () => ({ config, setConfig: updateConfig, load }),
+        [config],
+    );
 
     return (
         <ConfigContext.Provider value={contextValue}>

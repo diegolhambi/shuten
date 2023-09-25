@@ -1,3 +1,5 @@
+import '../utils/storage';
+
 import {
     DarkTheme,
     DefaultTheme,
