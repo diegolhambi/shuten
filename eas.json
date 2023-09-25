@@ -9,6 +9,9 @@
         },
         "preview": {
             "distribution": "internal",
+            "env": {
+                "TAMAGUI_OPTIMIZE_NATIVE_VIEWS": "1"
+            },
             "android": {
                 "buildType": "apk"
             }
