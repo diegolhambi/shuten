@@ -11,11 +11,13 @@ import React, {
     useState,
 } from 'react';
 
+import { useForeground } from '../utils/app-state';
 import { storage } from '../utils/storage';
 import ConfigContext from './config';
 
 type AdpContextData = {
     login(user: string, password: string): Promise<LoginResult>;
+    test(): Promise<void>;
     punch(): Promise<void>;
 };
 
@@ -47,7 +49,7 @@ const client = axios.create({
     withCredentials: true,
 });
 
-function loggedHeader(sessionId: string) {
+function loggedHeaders(sessionId: string): RawAxiosRequestHeaders {
     return {
         ...defaultHeaders,
         Newexpert_sessionid: sessionId,
@@ -139,8 +141,16 @@ export function AdpProvider({ children }: Props) {
     const [logged, setLogged] = useState(false);
 
     const initialized = useRef(false);
+    const revalidate = useRef(0);
 
-    function warmUp() {
+    useForeground(() => {
+        if (initialized.current) {
+            initialized.current = false;
+            revalidate.current++;
+        }
+    });
+
+    function doLogin() {
         const initial = DateTime.now().toMillis();
         setLogged(false);
 
@@ -179,25 +189,27 @@ export function AdpProvider({ children }: Props) {
         }
 
         initialized.current = true;
+        setLogged(false);
 
         const initial = DateTime.now().toMillis();
 
         const value = storage.getString('adp_session_id');
 
         if (!value) {
-            warmUp();
+            doLogin();
             return;
         }
 
         const parsed: AdpSessionId = JSON.parse(value);
 
         if (DateTime.now().toUnixInteger() > parsed.expires_at) {
-            warmUp();
+            storage.delete('adp_session_id');
+            doLogin();
             return;
         }
 
         client.defaults.headers.common = {
-            ...loggedHeader(parsed.value),
+            ...loggedHeaders(parsed.value),
         };
 
         client.defaults.params = {
@@ -209,7 +221,7 @@ export function AdpProvider({ children }: Props) {
         });
 
         setLogged(true);
-    }, [config]);
+    }, [config, revalidate.current]);
 
     async function punch() {
         if (!client) {
@@ -219,12 +231,48 @@ export function AdpProvider({ children }: Props) {
 
         try {
             const initial = DateTime.now().toMillis();
-            await client.post('punch/punchin', {
+            const result = await client.post('punch/punchin', {
                 punchType: 'SPMobile',
                 punchLatitude: null,
                 punchLongitude: null,
                 punchAction: null,
             });
+
+            if (
+                result.headers['content-type'] !== 'application/json' &&
+                result.headers['content-location'] === 'loginform.html.pt-br'
+            ) {
+                toast.show('Error, logged out');
+                return;
+            }
+
+            toast.show('Punched in', {
+                message: `In ${DateTime.now().toMillis() - initial}ms`,
+            });
+        } catch (error) {
+            toast.show('Error', {
+                message: JSON.stringify(error),
+            });
+        }
+    }
+
+    async function test() {
+        if (!client) {
+            toast.show('Punch not registered in ADP');
+            return;
+        }
+
+        try {
+            const initial = DateTime.now().toMillis();
+            const result = await client.get('punch/punchin');
+
+            if (
+                result.headers['content-type'] !== 'application/json' &&
+                result.headers['content-location'] === 'loginform.html.pt-br'
+            ) {
+                toast.show('Error, logged out');
+                return;
+            }
 
             toast.show('Punched in', {
                 message: `In ${DateTime.now().toMillis() - initial}ms`,
@@ -239,6 +287,7 @@ export function AdpProvider({ children }: Props) {
     const contextValue: AdpContextData = useMemo(() => {
         return {
             login,
+            test,
             punch,
         };
     }, [config.adp.activated, logged]);

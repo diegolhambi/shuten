@@ -255,7 +255,8 @@ export default function Home() {
                             size="$2"
                             icon={<MailCheck />}
                             onPress={() => {
-                                toast.show('Not implemented yet');
+                                adp.test();
+                                //toast.show('Not implemented yet');
                             }}
                         />
                         <Button
