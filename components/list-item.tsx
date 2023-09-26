@@ -9,7 +9,7 @@ import {
 const ItemFrame = styled(XStack, {
     name: 'ItemFrame',
 
-    space: '$2',
+    gap: '$2',
     px: '$4',
     py: '$3',
     bg: '$backgroundTransparent',
