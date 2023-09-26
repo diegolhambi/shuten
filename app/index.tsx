@@ -250,6 +250,7 @@ export default function Home() {
                     <XStack
                         space="$1"
                         alignItems="center"
+                        flexShrink={1}
                     >
                         <Button
                             size="$2"

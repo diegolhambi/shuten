@@ -7,5 +7,5 @@ export const BottomBar = styled(XStack, {
     bg: '$backgroundHover',
     alignItems: 'center',
     justifyContent: 'flex-end',
-    gap: '$5',
+    gap: '$4',
 });
