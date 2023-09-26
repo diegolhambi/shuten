@@ -5,8 +5,38 @@ import { Circle, H4, SizableText, styled, XStack, YStack } from 'tamagui';
 import { Punch, PunchType } from '../types/punch';
 import { hoursDiff, is24hourClock, ParseTime } from '../utils/date';
 
-const Indicator = styled(Circle, {
-    name: 'Indicator',
+const is24hour = is24hourClock();
+
+const punchLabel: { [K in Exclude<PunchType, 'punch'>]: string } = {
+    weekend: 'Weekend',
+    dayOff: 'Day off',
+    absence: 'Absence',
+    holiday: 'Holiday',
+    vacation: 'Vacation',
+};
+
+const TimeFrame = styled(XStack, {
+    name: 'TimeFrame',
+    gap: '$1.5',
+    alignItems: 'center',
+});
+
+const TimeText = styled(SizableText, {
+    name: 'TimeText',
+    color: '$gray9',
+    fontSize: '$3',
+    variants: {
+        isPunch: {
+            true: { color: '$color' },
+        },
+        predicted: {
+            true: { color: '$gray9' },
+        },
+    } as const,
+});
+
+const TimeIndicator = styled(Circle, {
+    name: 'TimeIndicator',
     size: '$0.75',
     variants: {
         enter: {
@@ -19,29 +49,16 @@ const Indicator = styled(Circle, {
     } as const,
 });
 
-const Interval = styled(SizableText, {
+const TimeInterval = styled(SizableText, {
+    name: 'TimeInterval',
     color: '$gray9',
+    fontSize: '$2',
     variants: {
-        is24hour: {
-            true: {
-                fontSize: '$true',
-            },
-            false: {
-                fontSize: '$1',
-            },
+        intervalEnded: {
+            true: { color: '$color' },
         },
     } as const,
 });
-
-const is24hour = is24hourClock();
-
-const punchLabel: { [K in Exclude<PunchType, 'punch'>]: string } = {
-    weekend: 'Weekend',
-    dayOff: 'Day off',
-    absence: 'Absence',
-    holiday: 'Holiday',
-    vacation: 'Vacation',
-};
 
 function Time({ punch, index }: { punch: Punch; index: number }) {
     const time = useMemo(() => {
@@ -55,26 +72,20 @@ function Time({ punch, index }: { punch: Punch; index: number }) {
     }, [punch.time]);
 
     return (
-        <XStack
-            space="$1.5"
-            alignItems="center"
-        >
+        <TimeFrame>
             {punch.type === 'punch' && (
-                <Indicator
+                <TimeIndicator
                     enter={index % 2 === 0}
                     predicted={punch.predicted}
                 />
             )}
-            <SizableText
-                color={
-                    punch.predicted || punch.type !== 'punch'
-                        ? '$gray9'
-                        : '$color'
-                }
+            <TimeText
+                isPunch={punch.type === 'punch'}
+                predicted={punch.predicted}
             >
                 {punch.type !== 'punch' ? punchLabel[punch.type] : time}
-            </SizableText>
-        </XStack>
+            </TimeText>
+        </TimeFrame>
     );
 }
 
@@ -84,6 +95,47 @@ export type PunchItemProps = {
     fetchedPunches: number;
     getPunches: (day: string) => Punch[];
 };
+
+const PunchItemFrame = styled(YStack, {
+    name: 'PunchItemFrame',
+    mx: '$4',
+    my: '$3',
+});
+
+const PunchItemDayFrame = styled(XStack, {
+    name: 'PunchItemDayFrame',
+    gap: '$2.5',
+    alignItems: 'center',
+});
+
+const PunchItemDayText = styled(H4, {
+    name: 'PunchItemDayText',
+    mb: '$2',
+    selectable: false,
+});
+
+const PunchItemTodayCircle = styled(Circle, {
+    name: 'PunchItemTodayCircle',
+    size: 10,
+    mb: '$2',
+    bg: '$blue9',
+});
+
+const PunchItemTimeFrame = styled(XStack, {
+    name: 'PunchItemTimeFrame',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    variants: {
+        is24hour: {
+            false: {
+                ml: '$1',
+            },
+            true: {
+                ml: '$1',
+            },
+        },
+    } as const,
+});
 
 export default function PunchItem(props: PunchItemProps) {
     const { day, today, fetchedPunches, getPunches } = props;
@@ -102,33 +154,14 @@ export default function PunchItem(props: PunchItemProps) {
     const isToday = useMemo(() => day === today, [day, today]);
 
     return (
-        <YStack
-            mx="$4"
-            my="$3"
-        >
-            <XStack
-                space="$2.5"
-                alignItems="center"
-            >
-                <H4
-                    mb="$2"
-                    selectable={false}
-                >
-                    {dayText}
-                </H4>
-                {isToday && (
-                    <Circle
-                        size={10}
-                        mb="$2"
-                        bg="$blue9"
-                    />
-                )}
-            </XStack>
-            <XStack
-                flexWrap="wrap"
-                space={is24hour ? '$3.5' : '$2.5'}
-                alignItems="center"
-                ml={is24hour ? '$1' : '$0'}
+        <PunchItemFrame>
+            <PunchItemDayFrame>
+                <PunchItemDayText>{dayText}</PunchItemDayText>
+                {isToday && <PunchItemTodayCircle />}
+            </PunchItemDayFrame>
+            <PunchItemTimeFrame
+                is24hour={is24hour}
+                gap={is24hour ? '$2.5' : '$2.5'}
             >
                 {punches.length === 0 ? (
                     <SizableText color="$gray9">No punches</SizableText>
@@ -137,12 +170,14 @@ export default function PunchItem(props: PunchItemProps) {
                         return (
                             <React.Fragment key={`${day}-${punch.time}`}>
                                 {index > 0 && index % 2 === 0 && (
-                                    <Interval mr={is24hour ? '$3.5' : '$2.5'}>
+                                    <TimeInterval
+                                        intervalEnded={!punches[2]?.predicted}
+                                    >
                                         {hoursDiff(
                                             (punches[index - 1] as Punch).time,
                                             punch.time,
                                         )}
-                                    </Interval>
+                                    </TimeInterval>
                                 )}
                                 <Time
                                     punch={punch}
@@ -152,7 +187,7 @@ export default function PunchItem(props: PunchItemProps) {
                         );
                     })
                 )}
-            </XStack>
-        </YStack>
+            </PunchItemTimeFrame>
+        </PunchItemFrame>
     );
 }
