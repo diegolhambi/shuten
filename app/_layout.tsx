@@ -53,7 +53,7 @@ function RootLayoutNav() {
     const colorScheme = useColorScheme();
 
     return (
-        <Provider>
+        <Provider defaultTheme={colorScheme === 'dark' ? 'dark' : 'light'}>
             <ThemeProvider
                 value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
             >
