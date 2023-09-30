@@ -8,11 +8,18 @@ export type HoursToWork = {
     durations: string[];
 };
 
-type NotificationConfig = {
+type ConfigDuration = {
+    lunch: string;
+    maxLunch: string;
+    maxShift: string;
+    maxWork: string;
+};
+
+type ConfigNotification = {
     activated: boolean;
 };
 
-type AdpConfig = {
+type ConfigAdp = {
     activated: boolean;
     user: string;
     password: string;
@@ -23,39 +30,24 @@ export type Config = {
     hoursToWork: {
         [key in Weekday]: HoursToWork;
     };
-    duration: {
-        lunch: string;
-        maxLunch: string;
-        maxShift: string;
-        maxWork: string;
-    };
-    notification: NotificationConfig;
-    adp: AdpConfig;
+    duration: ConfigDuration;
+    notification: ConfigNotification;
+    adp: ConfigAdp;
+};
+
+export const defaultHourToWork: HoursToWork = {
+    punches: ['07:45', '12:00', '13:10', '16:55'],
+    durations: ['PT4H15M', 'PT1H10M', 'PT3H45M'],
 };
 
 const defaultConfig: Config = {
     firstDayOfMonth: 16,
     hoursToWork: {
-        1: {
-            punches: ['07:45', '12:00', '13:10', '16:55'],
-            durations: ['PT4H15M', 'PT1H10M', 'PT3H45M'],
-        },
-        2: {
-            punches: ['07:45', '12:00', '13:10', '16:55'],
-            durations: ['PT4H15M', 'PT1H10M', 'PT3H45M'],
-        },
-        3: {
-            punches: ['07:45', '12:00', '13:10', '16:55'],
-            durations: ['PT4H15M', 'PT1H10M', 'PT3H45M'],
-        },
-        4: {
-            punches: ['07:45', '12:00', '13:10', '16:55'],
-            durations: ['PT4H15M', 'PT1H10M', 'PT3H45M'],
-        },
-        5: {
-            punches: ['07:45', '12:00', '13:10', '16:55'],
-            durations: ['PT4H15M', 'PT1H10M', 'PT3H45M'],
-        },
+        1: { ...defaultHourToWork },
+        2: { ...defaultHourToWork },
+        3: { ...defaultHourToWork },
+        4: { ...defaultHourToWork },
+        5: { ...defaultHourToWork },
         6: { punches: [], durations: [] },
         7: { punches: [], durations: [] },
     },
