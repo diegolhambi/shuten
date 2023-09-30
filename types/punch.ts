@@ -4,7 +4,8 @@ export type PunchType =
     | 'absence'
     | 'dayOff'
     | 'holiday'
-    | 'vacation';
+    | 'vacation'
+    | 'nonWorkingDay';
 
 export type Punch = {
     /*

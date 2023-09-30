@@ -13,6 +13,7 @@ const punchLabel: { [K in Exclude<PunchType, 'punch'>]: string } = {
     absence: 'Absence',
     holiday: 'Holiday',
     vacation: 'Vacation',
+    nonWorkingDay: 'Out of office',
 };
 
 const TimeFrame = styled(XStack, {
