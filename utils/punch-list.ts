@@ -1,7 +1,8 @@
 import { DateTime, Duration } from 'luxon';
 
-import { Config } from '../contexts/config';
+import { Config } from '../providers/config';
 import { Punch } from '../types/punch';
+import { Weekday } from './date';
 
 // TODO: receber data inicial da config
 export function monthDaysRange(): [initialDate: DateTime, finalDate: DateTime] {
@@ -51,7 +52,7 @@ export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
 
         const date = DateTime.fromISO(day);
 
-        const configHours = config.hoursToWork[date.weekday] || {
+        const configHours = config.hoursToWork[date.weekday as Weekday] || {
             punches: [],
             durations: [],
         };
@@ -62,6 +63,14 @@ export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
             [6, 7].indexOf(date.weekday) !== -1
         ) {
             return [{ time: '00:00', type: 'weekend', predicted: true }];
+        }
+
+        if (
+            listPunches.length === 0 &&
+            configHours.punches.length === 0 &&
+            [1, 2, 3, 4, 5].indexOf(date.weekday) !== -1
+        ) {
+            return [{ time: '00:00', type: 'nonWorkingDay', predicted: true }];
         }
 
         if (
