@@ -26,12 +26,18 @@ const animations = createAnimations({
 });
 
 const headingFont = createInterFont({
+    color: {
+        true: '$color',
+    },
     face: {
         700: { normal: 'InterBold' },
     },
 });
 
 const bodyFont = createInterFont({
+    color: {
+        true: '$color',
+    },
     face: {
         700: { normal: 'InterBold' },
     },
