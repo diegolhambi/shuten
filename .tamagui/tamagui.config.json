@@ -8,7 +8,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -479,7 +478,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "opacity": 0,
@@ -800,7 +798,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "horizontal": {
                 "true": {
@@ -1142,7 +1141,7 @@
             },
             "componentName": "Input",
             "isReactNative": true,
-            "isText": true,
+            "isText": false,
             "acceptsClassName": true,
             "isStyledHOC": false,
             "neverFlatten": true,
@@ -1187,7 +1186,7 @@
             },
             "componentName": "Input",
             "isReactNative": true,
-            "isText": true,
+            "isText": false,
             "acceptsClassName": true,
             "isStyledHOC": false
           }
@@ -1768,7 +1767,7 @@
             },
             "variants": {
               "size": {
-                "...size": "Function"
+                "...": "Function"
               },
               "flex": {
                 "true": {
@@ -1937,7 +1936,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "isReactNative": false,
@@ -2090,7 +2090,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true
             },
@@ -2291,7 +2290,7 @@
             },
             "componentName": "TextArea",
             "isReactNative": true,
-            "isText": true,
+            "isText": false,
             "acceptsClassName": true,
             "isStyledHOC": false,
             "neverFlatten": true,
@@ -2339,7 +2338,7 @@
             },
             "componentName": "TextArea",
             "isReactNative": true,
-            "isText": true,
+            "isText": false,
             "acceptsClassName": true,
             "isStyledHOC": false
           }
@@ -2631,7 +2630,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -2902,7 +2902,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "componentName": "AvatarFallback",
@@ -3064,7 +3065,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "componentName": "AvatarFallback",
@@ -3224,7 +3226,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -3317,7 +3320,8 @@
                 }
               },
               "size": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "componentName": "Avatar",
@@ -3478,7 +3482,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -3782,7 +3787,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -3938,7 +3944,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -4272,7 +4277,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -4535,7 +4541,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -4795,7 +4802,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -5059,7 +5067,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -5322,7 +5331,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -5586,7 +5596,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -5883,7 +5894,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -6336,7 +6348,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -6603,7 +6616,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -6872,7 +6886,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -7139,7 +7154,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "unstyled": {
                 "false": {
@@ -7883,7 +7899,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -8004,8 +8021,6 @@
             "isReactNative": true,
             "isText": false,
             "acceptsClassName": true,
-            "isInput": false,
-            "inlineProps": {},
             "isStyledHOC": false,
             "neverFlatten": true,
             "isHOC": true
@@ -8016,7 +8031,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -8212,7 +8226,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -8551,7 +8564,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -8834,7 +8848,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -8970,7 +8985,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -9161,7 +9175,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -9348,7 +9361,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -9676,7 +9688,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -9939,7 +9952,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "isReactNative": false,
@@ -10098,7 +10112,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "unstyled": {
                 "false": {
@@ -10268,7 +10283,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -10530,7 +10546,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -10793,7 +10810,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -11054,7 +11072,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -11314,7 +11333,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -11571,7 +11591,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -11702,7 +11723,6 @@
             "isReactNative": true,
             "isText": false,
             "acceptsClassName": true,
-            "isInput": false,
             "isStyledHOC": false
           }
         },
@@ -11855,7 +11875,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "componentName": "SelectGroup",
@@ -12014,7 +12035,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "componentName": "SelectIcon",
@@ -12029,7 +12051,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -12686,7 +12707,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -12779,7 +12801,8 @@
                 }
               },
               "size": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "componentName": "Square",
@@ -12938,7 +12961,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -13031,7 +13055,8 @@
                 }
               },
               "size": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "componentName": "Circle",
@@ -13189,7 +13214,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "unstyled": {
                 "false": {
@@ -13361,7 +13387,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "open": {
                 "true": {
@@ -13545,7 +13572,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -13815,7 +13843,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "open": {
                 "true": {
@@ -13999,7 +14028,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -14268,7 +14298,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "orientation": {
                 "horizontal": {},
@@ -14429,7 +14460,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "orientation": {
                 "horizontal": {},
@@ -14591,7 +14623,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -14858,7 +14891,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -15124,7 +15158,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "orientation": {
                 "horizontal": {},
@@ -15288,7 +15323,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "orientation": {
                 "horizontal": {},
@@ -15464,7 +15500,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -15730,7 +15767,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "isReactNative": false,
@@ -15886,7 +15924,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "isReactNative": false,
@@ -16043,7 +16082,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               }
             },
             "isReactNative": false,
@@ -16201,7 +16241,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "unstyled": {
                 "true": {
@@ -16405,7 +16446,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -16652,7 +16694,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "unstyled": {
                 "false": {
@@ -16839,7 +16882,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "unstyled": {
                 "false": {
@@ -17025,7 +17069,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "backgrounded": {
                 "true": {
@@ -17290,7 +17335,8 @@
                 }
               },
               "elevation": {
-                "...size": "Function"
+                "...size": "Function",
+                ":number": "Function"
               },
               "unstyled": {
                 "true": {
@@ -17353,7 +17399,6 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
@@ -17535,13 +17580,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$body",
               "tag": "p",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$true"
             },
             "inlineWhenUnflattened": {},
@@ -17717,13 +17762,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$heading",
               "tag": "h1",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$10",
               "accessibilityRole": "header",
               "margin": 0
@@ -17901,13 +17946,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$heading",
               "tag": "h2",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$9",
               "accessibilityRole": "header",
               "margin": 0
@@ -18085,13 +18130,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$heading",
               "tag": "h3",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$8",
               "accessibilityRole": "header",
               "margin": 0
@@ -18269,13 +18314,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$heading",
               "tag": "h4",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$7",
               "accessibilityRole": "header",
               "margin": 0
@@ -18453,13 +18498,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$heading",
               "tag": "h5",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$6",
               "accessibilityRole": "header",
               "margin": 0
@@ -18637,13 +18682,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$heading",
               "tag": "h6",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$5",
               "accessibilityRole": "header",
               "margin": 0
@@ -18821,13 +18866,13 @@
             "acceptsClassName": true,
             "isText": true,
             "defaultProps": {
-              "color": "$color",
               "display": "flex",
               "suppressHighlighting": true,
               "unstyled": false,
               "fontFamily": "$heading",
               "tag": "span",
               "userSelect": "auto",
+              "color": "$color",
               "size": "$8",
               "accessibilityRole": "header",
               "margin": 0
@@ -19175,170 +19220,6 @@
   ],
   "nameToPaths": {},
   "tamaguiConfig": {
-    "groupNames": [],
-    "settings": {},
-    "onlyAllowShorthands": false,
-    "fontLanguages": [],
-    "animations": {
-      "isReactNative": true,
-      "animations": {
-        "bouncy": {
-          "type": "spring",
-          "damping": 10,
-          "mass": 0.9,
-          "stiffness": 100
-        },
-        "lazy": {
-          "type": "spring",
-          "damping": 20,
-          "stiffness": 60
-        },
-        "quick": {
-          "type": "spring",
-          "damping": 20,
-          "mass": 1.2,
-          "stiffness": 250
-        }
-      },
-      "View": "Component",
-      "Text": "Component",
-      "useAnimatedNumber": "Function",
-      "useAnimatedNumberReaction": "Function",
-      "useAnimatedNumberStyle": "Function",
-      "usePresence": "Function",
-      "useAnimations": "Function"
-    },
-    "media": {
-      "xs": {
-        "maxWidth": 660
-      },
-      "sm": {
-        "maxWidth": 800
-      },
-      "md": {
-        "maxWidth": 1020
-      },
-      "lg": {
-        "maxWidth": 1280
-      },
-      "xl": {
-        "maxWidth": 1420
-      },
-      "xxl": {
-        "maxWidth": 1600
-      },
-      "gtXs": {
-        "minWidth": 661
-      },
-      "gtSm": {
-        "minWidth": 801
-      },
-      "gtMd": {
-        "minWidth": 1021
-      },
-      "gtLg": {
-        "minWidth": 1281
-      },
-      "short": {
-        "maxHeight": 820
-      },
-      "tall": {
-        "minHeight": 820
-      },
-      "hoverNone": {
-        "hover": "none"
-      },
-      "pointerCoarse": {
-        "pointer": "coarse"
-      }
-    },
-    "defaultFont": "$body",
-    "shouldAddPrefersColorThemes": true,
-    "themeClassNameOnRoot": true,
-    "shorthands": {
-      "ussel": "userSelect",
-      "cur": "cursor",
-      "pe": "pointerEvents",
-      "col": "color",
-      "ff": "fontFamily",
-      "fos": "fontSize",
-      "fost": "fontStyle",
-      "fow": "fontWeight",
-      "ls": "letterSpacing",
-      "lh": "lineHeight",
-      "ta": "textAlign",
-      "tt": "textTransform",
-      "ww": "wordWrap",
-      "ac": "alignContent",
-      "ai": "alignItems",
-      "als": "alignSelf",
-      "b": "bottom",
-      "bc": "backgroundColor",
-      "bg": "backgroundColor",
-      "bbc": "borderBottomColor",
-      "bblr": "borderBottomLeftRadius",
-      "bbrr": "borderBottomRightRadius",
-      "bbw": "borderBottomWidth",
-      "blc": "borderLeftColor",
-      "blw": "borderLeftWidth",
-      "boc": "borderColor",
-      "br": "borderRadius",
-      "bs": "borderStyle",
-      "brw": "borderRightWidth",
-      "brc": "borderRightColor",
-      "btc": "borderTopColor",
-      "btlr": "borderTopLeftRadius",
-      "btrr": "borderTopRightRadius",
-      "btw": "borderTopWidth",
-      "bw": "borderWidth",
-      "dsp": "display",
-      "f": "flex",
-      "fb": "flexBasis",
-      "fd": "flexDirection",
-      "fg": "flexGrow",
-      "fs": "flexShrink",
-      "fw": "flexWrap",
-      "h": "height",
-      "jc": "justifyContent",
-      "l": "left",
-      "m": "margin",
-      "mah": "maxHeight",
-      "maw": "maxWidth",
-      "mb": "marginBottom",
-      "mih": "minHeight",
-      "miw": "minWidth",
-      "ml": "marginLeft",
-      "mr": "marginRight",
-      "mt": "marginTop",
-      "mx": "marginHorizontal",
-      "my": "marginVertical",
-      "o": "opacity",
-      "ov": "overflow",
-      "p": "padding",
-      "pb": "paddingBottom",
-      "pl": "paddingLeft",
-      "pos": "position",
-      "pr": "paddingRight",
-      "pt": "paddingTop",
-      "px": "paddingHorizontal",
-      "py": "paddingVertical",
-      "r": "right",
-      "shac": "shadowColor",
-      "shar": "shadowRadius",
-      "shof": "shadowOffset",
-      "shop": "shadowOpacity",
-      "t": "top",
-      "w": "width",
-      "zi": "zIndex",
-      "bls": "borderLeftStyle",
-      "brs": "borderRightStyle",
-      "bts": "borderTopStyle",
-      "bbs": "borderBottomStyle",
-      "bxs": "boxSizing",
-      "bxsh": "boxShadow",
-      "ox": "overflowX",
-      "oy": "overflowY"
-    },
     "fonts": {
       "body": {
         "family": "Inter",
@@ -19556,6 +19437,169 @@
           "true": 14
         }
       }
+    },
+    "settings": {},
+    "onlyAllowShorthands": false,
+    "fontLanguages": [],
+    "animations": {
+      "isReactNative": true,
+      "animations": {
+        "bouncy": {
+          "type": "spring",
+          "damping": 10,
+          "mass": 0.9,
+          "stiffness": 100
+        },
+        "lazy": {
+          "type": "spring",
+          "damping": 20,
+          "stiffness": 60
+        },
+        "quick": {
+          "type": "spring",
+          "damping": 20,
+          "mass": 1.2,
+          "stiffness": 250
+        }
+      },
+      "View": "Component",
+      "Text": "Component",
+      "useAnimatedNumber": "Function",
+      "useAnimatedNumberReaction": "Function",
+      "useAnimatedNumberStyle": "Function",
+      "usePresence": "Function",
+      "useAnimations": "Function"
+    },
+    "media": {
+      "xs": {
+        "maxWidth": 660
+      },
+      "sm": {
+        "maxWidth": 800
+      },
+      "md": {
+        "maxWidth": 1020
+      },
+      "lg": {
+        "maxWidth": 1280
+      },
+      "xl": {
+        "maxWidth": 1420
+      },
+      "xxl": {
+        "maxWidth": 1600
+      },
+      "gtXs": {
+        "minWidth": 661
+      },
+      "gtSm": {
+        "minWidth": 801
+      },
+      "gtMd": {
+        "minWidth": 1021
+      },
+      "gtLg": {
+        "minWidth": 1281
+      },
+      "short": {
+        "maxHeight": 820
+      },
+      "tall": {
+        "minHeight": 820
+      },
+      "hoverNone": {
+        "hover": "none"
+      },
+      "pointerCoarse": {
+        "pointer": "coarse"
+      }
+    },
+    "defaultFont": "$body",
+    "shouldAddPrefersColorThemes": true,
+    "themeClassNameOnRoot": true,
+    "shorthands": {
+      "ussel": "userSelect",
+      "cur": "cursor",
+      "pe": "pointerEvents",
+      "col": "color",
+      "ff": "fontFamily",
+      "fos": "fontSize",
+      "fost": "fontStyle",
+      "fow": "fontWeight",
+      "ls": "letterSpacing",
+      "lh": "lineHeight",
+      "ta": "textAlign",
+      "tt": "textTransform",
+      "ww": "wordWrap",
+      "ac": "alignContent",
+      "ai": "alignItems",
+      "als": "alignSelf",
+      "b": "bottom",
+      "bc": "backgroundColor",
+      "bg": "backgroundColor",
+      "bbc": "borderBottomColor",
+      "bblr": "borderBottomLeftRadius",
+      "bbrr": "borderBottomRightRadius",
+      "bbw": "borderBottomWidth",
+      "blc": "borderLeftColor",
+      "blw": "borderLeftWidth",
+      "boc": "borderColor",
+      "br": "borderRadius",
+      "bs": "borderStyle",
+      "brw": "borderRightWidth",
+      "brc": "borderRightColor",
+      "btc": "borderTopColor",
+      "btlr": "borderTopLeftRadius",
+      "btrr": "borderTopRightRadius",
+      "btw": "borderTopWidth",
+      "bw": "borderWidth",
+      "dsp": "display",
+      "f": "flex",
+      "fb": "flexBasis",
+      "fd": "flexDirection",
+      "fg": "flexGrow",
+      "fs": "flexShrink",
+      "fw": "flexWrap",
+      "h": "height",
+      "jc": "justifyContent",
+      "l": "left",
+      "m": "margin",
+      "mah": "maxHeight",
+      "maw": "maxWidth",
+      "mb": "marginBottom",
+      "mih": "minHeight",
+      "miw": "minWidth",
+      "ml": "marginLeft",
+      "mr": "marginRight",
+      "mt": "marginTop",
+      "mx": "marginHorizontal",
+      "my": "marginVertical",
+      "o": "opacity",
+      "ov": "overflow",
+      "p": "padding",
+      "pb": "paddingBottom",
+      "pl": "paddingLeft",
+      "pos": "position",
+      "pr": "paddingRight",
+      "pt": "paddingTop",
+      "px": "paddingHorizontal",
+      "py": "paddingVertical",
+      "r": "right",
+      "shac": "shadowColor",
+      "shar": "shadowRadius",
+      "shof": "shadowOffset",
+      "shop": "shadowOpacity",
+      "t": "top",
+      "w": "width",
+      "zi": "zIndex",
+      "bls": "borderLeftStyle",
+      "brs": "borderRightStyle",
+      "bts": "borderTopStyle",
+      "bbs": "borderBottomStyle",
+      "bxs": "boxSizing",
+      "bxsh": "boxShadow",
+      "ox": "overflowX",
+      "oy": "overflowY"
     },
     "themes": {
       "dark": {
