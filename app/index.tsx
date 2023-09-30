@@ -113,8 +113,12 @@ export default function Home() {
         }, []),
     );
 
+    useEffect(() => {
+        setFetchedPunches(DateTime.now().toUnixInteger());
+    }, [JSON.stringify(config)]);
+
     const getPunches = useCallback(getDayPunches(PUNCHES, config), [
-        config,
+        JSON.stringify(config),
         fetchedPunches,
     ]);
 
@@ -315,6 +319,7 @@ export default function Home() {
                 <Menu.Item
                     onPress={() => {
                         router.push('/settings');
+                        setOpenMenu(false);
                     }}
                     onLongPress={() => {
                         setDevMode(!devMode);
