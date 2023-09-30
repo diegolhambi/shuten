@@ -1,7 +1,7 @@
 import { useToastController } from '@tamagui/toast';
 import { Stack } from 'expo-router';
 import { DateTime } from 'luxon';
-import { useContext, useEffect, useRef, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import {
     Button,
     Input,

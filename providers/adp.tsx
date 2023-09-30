@@ -1,3 +1,4 @@
+import CookieManager, { Cookie } from '@react-native-cookies/cookies';
 import { useToastController } from '@tamagui/toast';
 import axios, { RawAxiosRequestHeaders } from 'axios';
 import { DateTime } from 'luxon';
@@ -10,6 +11,7 @@ import React, {
     useRef,
     useState,
 } from 'react';
+import { Platform } from 'react-native';
 
 import { useForeground } from '../utils/app-state';
 import { storage } from '../utils/storage';
@@ -19,11 +21,6 @@ type AdpContextData = {
     login(user: string, password: string): Promise<LoginResult>;
     test(): Promise<void>;
     punch(): Promise<void>;
-};
-
-type AdpSessionId = {
-    expires_at: number;
-    value: string;
 };
 
 const AdpContext = createContext<AdpContextData>({} as AdpContextData);
@@ -42,12 +39,33 @@ const defaultHeaders: RawAxiosRequestHeaders = {
     'Accept-Language': 'pt-BR,pt;q=0.9',
     'Cache-Control': 'max-age=0',
 };
+
 const client = axios.create({
+    withCredentials: true,
     baseURL: 'https://expert.brasil.adp.com/expert/api/',
     headers: defaultHeaders,
     timeout: 3000,
-    withCredentials: true,
 });
+
+client.interceptors.response.use(
+    (response) => {
+        if (Platform.OS === 'ios') {
+            CookieManager.getAll().then((cookies) => {
+                storage.set('adp_cookies', JSON.stringify(cookies));
+            });
+        }
+
+        if (Platform.OS === 'android') {
+            CookieManager.flush();
+        }
+
+        return response;
+    },
+    (error) => {
+        console.log(error);
+        return Promise.reject(error);
+    },
+);
 
 function loggedHeaders(sessionId: string): RawAxiosRequestHeaders {
     return {
@@ -58,7 +76,26 @@ function loggedHeaders(sessionId: string): RawAxiosRequestHeaders {
     };
 }
 
+function isLoggedOut(headers: RawAxiosRequestHeaders): boolean {
+    return (
+        headers['content-type'] !== 'application/json' &&
+        headers['content-location'] === 'loginform.html.pt-br'
+    );
+}
+
+function cleanSession() {
+    storage.delete('adp_session_expires');
+    storage.delete('adp_newexpert_sessionid');
+    storage.delete('adp_cookies');
+    CookieManager.clearAll();
+    client.defaults.headers.common = {
+        ...defaultHeaders,
+    };
+}
+
 async function login(user: string, password: string): Promise<LoginResult> {
+    cleanSession();
+
     try {
         // o retorno daqui talvez possa indicar se precisa mudar de senha
         // loginform.fcc 302 >
@@ -113,22 +150,18 @@ async function login(user: string, password: string): Promise<LoginResult> {
                 lp: 'true',
             };
 
-            const adp_session_id: AdpSessionId = {
-                expires_at: DateTime.now().plus({ hours: 2 }).toUnixInteger(),
-                value: sessionId,
-            };
-
-            storage.set('adp_session_id', JSON.stringify(adp_session_id));
+            storage.set(
+                'adp_session_expires',
+                DateTime.now().plus({ hours: 2 }).toUnixInteger(),
+            );
+            storage.set('adp_newexpert_sessionid', sessionId);
 
             return 'Success';
         } else {
-            client.defaults.params = {};
-            client.defaults.headers.common = { ...defaultHeaders };
             return 'SessionIdNotFound';
         }
     } catch (error) {
-        client.defaults.params = {};
-        client.defaults.headers.common = { ...defaultHeaders };
+        cleanSession();
         console.log('Adp login error', error);
         return 'Error';
     }
@@ -193,34 +226,51 @@ export function AdpProvider({ children }: Props) {
 
         const initial = DateTime.now().toMillis();
 
-        const value = storage.getString('adp_session_id');
+        const sessionId = storage.getString('adp_newexpert_sessionid');
 
-        if (!value) {
+        if (!sessionId) {
             doLogin();
             return;
         }
 
-        const parsed: AdpSessionId = JSON.parse(value);
+        const expires = storage.getNumber('adp_session_expires') || 0;
 
-        if (DateTime.now().toUnixInteger() > parsed.expires_at) {
-            storage.delete('adp_session_id');
+        if (DateTime.now().toUnixInteger() > expires) {
             doLogin();
             return;
+        }
+
+        if (Platform.OS === 'ios') {
+            const cookiesString = storage.getString('adp_cookies');
+            const cookies: { [key: string]: Cookie } = cookiesString
+                ? JSON.parse(cookiesString)
+                : {};
+
+            for (const [, cookie] of Object.entries(cookies)) {
+                CookieManager.set(client.defaults.baseURL!, cookie);
+            }
         }
 
         client.defaults.headers.common = {
-            ...loggedHeaders(parsed.value),
+            ...loggedHeaders(sessionId),
         };
 
         client.defaults.params = {
             lp: 'true',
         };
 
-        toast.show('Client rehydrated', {
-            message: `In ${DateTime.now().toMillis() - initial}ms`,
-        });
+        client.get('punch/punchin/user-info').then((result) => {
+            if (isLoggedOut(result.headers)) {
+                doLogin();
+                return;
+            }
 
-        setLogged(true);
+            toast.show('Client rehydrated', {
+                message: `In ${DateTime.now().toMillis() - initial}ms`,
+            });
+
+            setLogged(true);
+        });
     }, [config, revalidate.current]);
 
     async function punch() {
@@ -238,11 +288,21 @@ export function AdpProvider({ children }: Props) {
                 punchAction: null,
             });
 
-            if (
-                result.headers['content-type'] !== 'application/json' &&
-                result.headers['content-location'] === 'loginform.html.pt-br'
-            ) {
-                toast.show('Error, logged out');
+            // response 200
+            /* data:
+            { 
+                "punchType": "SPDesktop", 
+                "punchLatitude": null, 
+                "punchLongitude": null, 
+                "punchAction": null, 
+                "punchDateTime": "2023-09-26T16:01:59.462+00:00", 
+                "punchTimezone": "-180" 
+            }
+
+            */
+
+            if (isLoggedOut(result.headers)) {
+                toast.show('Punch not registered in ADP');
                 return;
             }
 
@@ -266,16 +326,15 @@ export function AdpProvider({ children }: Props) {
             const initial = DateTime.now().toMillis();
             const result = await client.get('punch/punchin');
 
-            if (
-                result.headers['content-type'] !== 'application/json' &&
-                result.headers['content-location'] === 'loginform.html.pt-br'
-            ) {
+            if (isLoggedOut(result.headers)) {
                 toast.show('Error, logged out');
+                console.log(result.data);
                 return;
             }
 
             toast.show('Punched in', {
-                message: `In ${DateTime.now().toMillis() - initial}ms`,
+                // eslint-disable-next-line prettier/prettier
+                message: `In ${DateTime.now().toMillis() - initial}ms ${JSON.stringify(result.data)}`,
             });
         } catch (error) {
             toast.show('Error', {
