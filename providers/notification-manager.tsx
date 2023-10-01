@@ -1,5 +1,5 @@
 import * as Notifications from 'expo-notifications';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import React, {
     createContext,
     useContext,
@@ -52,24 +52,39 @@ function registerChannels() {
 
 const textNotications = {
     0: {
-        title: 'Time to Start Work',
+        title: 'Time to start work',
         body: "It's time to start your workday. Please clock in now to begin your shift.",
     },
     1: {
-        title: 'Lunch Break',
-        body: "It's time for your lunch break. Don't forget to clock out!",
+        title: 'Lunchtime',
+        body: "It's time for your lunchtime. Don't forget to clock out!",
     },
     2: {
-        title: 'Back from Lunch',
+        title: 'Return from lunch',
         body: "Welcome back! Don't forget to clock in to resume your work.",
     },
     3: {
-        title: 'End of Workday Reminder',
-        body: 'Your workday will end in 10 minutes. Please ensure all tasks are completed and remember to clock out on time.',
-    },
-    '3_time': {
-        title: 'End of Workday',
+        title: 'End of work',
         body: 'Congratulations, your workday is over! Remember to clock out.',
+    },
+};
+
+const textEarlyNotifications = {
+    0: {
+        title: 'Get ready to start workoc',
+        body: 'Your workday will begin in % minutes.',
+    },
+    1: {
+        title: 'Lunch break reminder',
+        body: 'Your lunch break is in % minutes.',
+    },
+    2: {
+        title: 'Returning to work soon',
+        body: 'You will be returning from lunch in % minutes.',
+    },
+    3: {
+        title: 'End of workday reminder',
+        body: 'Your workday will end in % minutes.',
     },
 };
 
@@ -107,12 +122,56 @@ export function NotificationProvider({ children }: Props) {
         return granted;
     }
 
+    function schedulePunchNotification(punch: 0 | 1 | 2 | 3, time: DateTime) {
+        const notificationConfig = config.notification[punch];
+
+        if (notificationConfig.early) {
+            const notifyEarlyTrigger = time.minus({
+                minutes: config.notification.howEarly,
+            });
+
+            Notifications.scheduleNotificationAsync({
+                content: {
+                    categoryIdentifier: 'punch',
+                    ...textEarlyNotifications[0],
+                },
+                identifier: `punch_${punch}_${notifyEarlyTrigger.toFormat(
+                    'yyyy-MM-dd_HH-mm',
+                )}`,
+                trigger: notifyEarlyTrigger.toJSDate(),
+            });
+        }
+
+        if (notificationConfig.onTime) {
+            Notifications.scheduleNotificationAsync({
+                content: {
+                    categoryIdentifier: 'punch',
+                    ...textNotications[0],
+                },
+                identifier: `punch_${punch}_${time.toFormat(
+                    'yyyy-MM-dd_HH-mm',
+                )}`,
+                trigger: time.toJSDate(),
+            });
+        }
+    }
+
     async function scheduleFirstPunch(punches: PunchesMap) {
         if (!granted) {
             return;
         }
 
         if (!config.hoursToWork) {
+            return;
+        }
+
+        if (!config.notification.activated) {
+            return;
+        }
+
+        const firstPunchConfig = config.notification[0];
+
+        if (!firstPunchConfig.onTime && !firstPunchConfig.early) {
             return;
         }
 
@@ -142,16 +201,7 @@ export function NotificationProvider({ children }: Props) {
             });
 
             if (today < notifyTrigger) {
-                await Notifications.scheduleNotificationAsync({
-                    content: {
-                        categoryIdentifier: 'punch',
-                        ...textNotications[0],
-                    },
-                    identifier: `punch_${notifyTrigger.toFormat(
-                        'yyyy-MM-dd_HH-mm',
-                    )}`,
-                    trigger: notifyTrigger.toJSDate(),
-                });
+                schedulePunchNotification(0, notifyTrigger);
             }
 
             iterator = iterator.plus({ days: 1 });
@@ -184,25 +234,16 @@ export function NotificationProvider({ children }: Props) {
             string,
         ];
 
-        let notifyTrigger = DateTime.fromFormat(time, 'yyyy-LL-dd HH:mm').set({
-            hour: +hour,
-            minute: +minute,
-            second: 0,
-            millisecond: 0,
-        });
-
-        if (punches.length - 1 === index) {
-            notifyTrigger = notifyTrigger.minus({ minutes: 10 });
-        }
-
-        Notifications.scheduleNotificationAsync({
-            content: {
-                categoryIdentifier: 'punch',
-                ...textNotications[index as 1 | 2 | 3],
+        const notifyTrigger = DateTime.fromFormat(time, 'yyyy-LL-dd HH:mm').set(
+            {
+                hour: +hour,
+                minute: +minute,
+                second: 0,
+                millisecond: 0,
             },
-            identifier: `punch_${notifyTrigger.toFormat('yyyy-MM-dd_HH-mm')}`,
-            trigger: notifyTrigger.toJSDate(),
-        });
+        );
+
+        schedulePunchNotification(index as 0 | 1 | 2 | 3, notifyTrigger);
     }
 
     const contextValue = useMemo(

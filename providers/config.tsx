@@ -15,8 +15,18 @@ type ConfigDuration = {
     maxWork: string;
 };
 
+type WhenNotify = {
+    onTime: boolean;
+    early: boolean;
+};
+
 type ConfigNotification = {
     activated: boolean;
+    howEarly: number;
+    0: WhenNotify;
+    1: WhenNotify;
+    2: WhenNotify;
+    3: WhenNotify;
 };
 
 type ConfigAdp = {
@@ -59,6 +69,11 @@ const defaultConfig: Config = {
     },
     notification: {
         activated: false,
+        howEarly: 10,
+        0: { onTime: true, early: false },
+        1: { onTime: true, early: false },
+        2: { onTime: true, early: false },
+        3: { onTime: true, early: true },
     },
     adp: {
         activated: false,
@@ -87,6 +102,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
     }, []);
 
     async function load() {
+        //storage.set('config', JSON.stringify(defaultConfig));
         try {
             const jsonValue = storage.getString('config');
 

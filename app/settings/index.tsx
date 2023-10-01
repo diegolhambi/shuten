@@ -40,7 +40,12 @@ export default function Config() {
                         router.push('/settings/hours');
                     }}
                     title="Workdays"
-                    subTitle="Select the days you work"
+                />
+                <ConfigItem
+                    onPress={() => {
+                        router.push('/settings/notifications');
+                    }}
+                    title="Notifications"
                 />
                 <ConfigItem
                     onPress={() => {
