@@ -84,23 +84,20 @@ export default function Home() {
         setDevDate(DateTime.now().toFormat('yyyy-MM-dd HH:mm'));
     }, [devMode]);
 
-    async function handleNotifications() {
-        const granted = await notification.requestPermission();
-
-        if (!granted && !devMode) {
-            return;
-        }
-
-        await notification.scheduleFirstPunch(PUNCHES);
-    }
-
     useFocusEffect(
         useCallback(() => {
             if (fetchedPunches === 0) {
                 return;
             }
 
-            handleNotifications();
+            notification.requestPermission().then((granted) => {
+                if (!granted || __DEV__) {
+                    console.log('not scheduling first punch notification');
+                    return;
+                }
+
+                notification.scheduleFirstPunch(PUNCHES);
+            });
         }, [fetchedPunches]),
     );
 
@@ -117,8 +114,12 @@ export default function Home() {
     );
 
     useEffect(() => {
-        setFetchedPunches(DateTime.now().toUnixInteger());
+        setFetchedPunches(DateTime.now().toMillis());
     }, [JSON.stringify(config)]);
+
+    useEffect(() => {
+        databasePunches();
+    }, []);
 
     const getPunches = useCallback(getDayPunches(PUNCHES, config), [
         JSON.stringify(config),
@@ -191,13 +192,9 @@ export default function Home() {
                 PUNCHES.set(item.date, [{ time: item.time, type: item.type }]);
             }
 
-            setFetchedPunches(DateTime.now().toUnixInteger());
+            setFetchedPunches(DateTime.now().toMillis());
         }, true);
     }
-
-    useEffect(() => {
-        databasePunches();
-    }, []);
 
     async function insertPunch(dateTime?: string) {
         const value = dateTime || DateTime.now().toFormat('yyyy-LL-dd HH:mm');
