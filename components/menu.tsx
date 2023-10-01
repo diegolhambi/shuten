@@ -33,6 +33,7 @@ function Menu(props: SheetProps) {
 
     return (
         <Sheet
+            modal
             dismissOnSnapToBottom
             open
             snapPointsMode="fit"
