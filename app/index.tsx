@@ -6,7 +6,7 @@ import { ResultSet, SQLError } from 'expo-sqlite';
 import * as SystemUI from 'expo-system-ui';
 import { DateTime } from 'luxon';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { FlatList, Platform } from 'react-native';
+import { FlatList, Platform, Vibration } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Input, styled, useTheme, XStack } from 'tamagui';
 
@@ -286,9 +286,22 @@ export default function Home() {
                     <Date />
                 )}
                 <PunchButton
+                    onPressIn={() => {
+                        if (Platform.OS === 'android') {
+                            Vibration.vibrate([10, 5], true);
+                        }
+                    }}
+                    onPressOut={() => {
+                        if (Platform.OS === 'android') {
+                            Vibration.cancel();
+                        }
+                    }}
                     onLongPress={() => {
+                        Vibration.cancel();
+                        Vibration.vibrate(450, false);
+
                         insertPunch(devDate || undefined);
-                        if (!devMode) {
+                        if (!devMode && config.adp.activated) {
                             adp.punch();
                         }
                     }}
