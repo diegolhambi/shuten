@@ -4,26 +4,27 @@ import { Config } from '../providers/config';
 import { Punch } from '../types/punch';
 import { Weekday } from './date';
 
-// TODO: receber data inicial da config
-export function monthDaysRange(): [initialDate: DateTime, finalDate: DateTime] {
+export function monthDaysRange(
+    firstDay: number,
+): [initialDate: DateTime, finalDate: DateTime] {
     const today = DateTime.now();
 
     let initalDate: DateTime;
     let finalDate: DateTime;
 
-    if (today.day >= 16) {
-        initalDate = today.set({ day: 16 });
+    if (today.day >= firstDay) {
+        initalDate = today.set({ day: firstDay });
         finalDate = initalDate.plus({ days: 30 });
     } else {
-        initalDate = today.minus({ month: 1 }).set({ day: 16 });
+        initalDate = today.minus({ month: 1 }).set({ day: firstDay });
         finalDate = initalDate.plus({ days: 30 });
     }
 
     return [initalDate, finalDate];
 }
 
-export function days() {
-    const [initalDate, finalDate] = monthDaysRange();
+export function days(firstDay: number): string[] {
+    const [initalDate, finalDate] = monthDaysRange(firstDay);
 
     const diff = finalDate.diff(initalDate, 'days').days;
 
@@ -38,8 +39,8 @@ export function days() {
     return days;
 }
 
-export function indexToday(): number {
-    const [initialDate] = monthDaysRange();
+export function indexToday(firstDay: number): number {
+    const [initialDate] = monthDaysRange(firstDay);
 
     return DateTime.now().diff(initialDate, 'days').days;
 }

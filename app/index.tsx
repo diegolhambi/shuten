@@ -56,12 +56,15 @@ export default function Home() {
     const [devMode, setDevMode] = useState(__DEV__);
     const [devDate, setDevDate] = useState<string | undefined>(undefined);
 
-    const data = useMemo(days, []);
+    const data = useMemo(
+        () => days(config.firstDayOfMonth),
+        [JSON.stringify(config)],
+    );
     const initialIndex = useMemo(() => {
-        const index = indexToday() - 3;
+        const index = indexToday(config.firstDayOfMonth) - 3;
 
         return index < 0 ? 0 : index;
-    }, []);
+    }, [JSON.stringify(config)]);
 
     useEffect(() => {
         const timer = setInterval(() => {
