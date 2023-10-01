@@ -90,5 +90,4 @@ const SwitchFrame = styled(YStack, {
 export const AppSwitch = createSwitch({
     Frame: SwitchFrame,
     Thumb: SwitchThumb,
-    acceptsUnstyled: true,
 });
