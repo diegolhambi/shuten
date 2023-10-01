@@ -81,16 +81,11 @@ export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
             return listPunches;
         }
 
-        if (
-            listPunches.length === 0 &&
-            date.startOf('day') > today.startOf('day')
-        ) {
-            return configHours.punches.map((time) => {
-                return { type: 'punch', time, predicted: true };
-            });
+        if (!date.hasSame(today, 'day')) {
+            return listPunches;
         }
 
-        if (date.startOf('day') < today.startOf('day')) {
+        if (configHours.punches.length === 0 && listPunches.length > 0) {
             return listPunches;
         }
 
