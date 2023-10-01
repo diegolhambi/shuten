@@ -274,6 +274,10 @@ export function AdpProvider({ children }: Props) {
     }, [config, revalidate.current]);
 
     async function punch() {
+        if (!config.adp.activated) {
+            return;
+        }
+
         if (!client) {
             toast.show('Punch not registered in ADP');
             return;
