@@ -318,16 +318,28 @@ export default function Home() {
                     Add punch
                 </Menu.Item>
                 {devMode ? (
-                    <Menu.Item
-                        onPress={() => {
-                            db.transaction((tx) =>
-                                tx.executeSql('DELETE FROM punches'),
-                            );
-                            databasePunches();
-                        }}
-                    >
-                        Nuke DB
-                    </Menu.Item>
+                    <>
+                        <Menu.Item
+                            onPress={() => {
+                                db.transaction((tx) =>
+                                    tx.executeSql('DELETE FROM punches'),
+                                );
+                                databasePunches();
+                            }}
+                        >
+                            Nuke DB
+                        </Menu.Item>
+                        <Menu.Item
+                            onPress={() => {
+                                router.push(
+                                    '/settings/scheduled-notifications',
+                                );
+                                setOpenMenu(false);
+                            }}
+                        >
+                            List notifications
+                        </Menu.Item>
+                    </>
                 ) : null}
                 <Menu.Item
                     onPress={() => {
