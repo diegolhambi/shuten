@@ -71,7 +71,7 @@ const textNotications = {
 
 const textEarlyNotifications = {
     0: {
-        title: 'Get ready to start workoc',
+        title: 'Get ready to start work',
         body: 'Your workday will begin in % minutes.',
     },
     1: {
