@@ -133,7 +133,11 @@ export function NotificationProvider({ children }: Props) {
             Notifications.scheduleNotificationAsync({
                 content: {
                     categoryIdentifier: 'punch',
-                    ...textEarlyNotifications[0],
+                    title: textEarlyNotifications[punch].title,
+                    body: textEarlyNotifications[punch].body.replace(
+                        '%',
+                        `${config.notification.howEarly}`,
+                    ),
                 },
                 identifier: `punch_${punch}_${notifyEarlyTrigger.toFormat(
                     'yyyy-MM-dd_HH-mm',
@@ -146,7 +150,7 @@ export function NotificationProvider({ children }: Props) {
             Notifications.scheduleNotificationAsync({
                 content: {
                     categoryIdentifier: 'punch',
-                    ...textNotications[0],
+                    ...textNotications[punch],
                 },
                 identifier: `punch_${punch}_${time.toFormat(
                     'yyyy-MM-dd_HH-mm',
@@ -208,7 +212,7 @@ export function NotificationProvider({ children }: Props) {
         }
     }
 
-    function scheduleNext(time: string, punches: Punch[]) {
+    function scheduleNext(dateTime: string, punches: Punch[]) {
         if (!granted) {
             return;
         }
@@ -234,14 +238,15 @@ export function NotificationProvider({ children }: Props) {
             string,
         ];
 
-        const notifyTrigger = DateTime.fromFormat(time, 'yyyy-LL-dd HH:mm').set(
-            {
-                hour: +hour,
-                minute: +minute,
-                second: 0,
-                millisecond: 0,
-            },
-        );
+        const notifyTrigger = DateTime.fromFormat(
+            dateTime,
+            'yyyy-LL-dd HH:mm',
+        ).set({
+            hour: +hour,
+            minute: +minute,
+            second: 0,
+            millisecond: 0,
+        });
 
         schedulePunchNotification(index as 0 | 1 | 2 | 3, notifyTrigger);
     }
