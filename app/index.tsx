@@ -225,7 +225,7 @@ export default function Home() {
 
                 notification.scheduleNext(
                     value,
-                    getPunches(today.toFormat('yyyy-LL-dd')),
+                    getPunches(value.split(' ')[0]!),
                 );
             },
         );
