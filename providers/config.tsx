@@ -85,7 +85,6 @@ const defaultConfig: Config = {
 type ConfigContextData = {
     config: Config;
     setConfig: (config: Config) => void;
-    load(): Promise<void>;
 };
 
 const ConfigContext = createContext<ConfigContextData>({} as ConfigContextData);
@@ -94,28 +93,14 @@ type ConfigProviderProps = {
     children?: React.ReactNode;
 };
 
+if (!storage.contains('config')) {
+    storage.set('config', JSON.stringify(defaultConfig));
+}
+
 export function ConfigProvider({ children }: ConfigProviderProps) {
-    const [config, setConfig] = useState<Config>(defaultConfig);
-
-    useEffect(() => {
-        load();
-    }, []);
-
-    async function load() {
-        //storage.set('config', JSON.stringify(defaultConfig));
-        try {
-            const jsonValue = storage.getString('config');
-
-            if (!jsonValue) {
-                storage.set('config', JSON.stringify(defaultConfig));
-                return;
-            }
-
-            setConfig(JSON.parse(jsonValue));
-        } catch (e) {
-            console.log('Cant load the config', e);
-        }
-    }
+    const [config, setConfig] = useState<Config>(
+        JSON.parse(storage.getString('config')!),
+    );
 
     function updateConfig(newConfig: Config) {
         setConfig(newConfig);
@@ -123,7 +108,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
     }
 
     const contextValue = useMemo(
-        () => ({ config, setConfig: updateConfig, load }),
+        () => ({ config, setConfig: updateConfig }),
         [config],
     );
 
