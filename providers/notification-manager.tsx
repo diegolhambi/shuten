@@ -248,6 +248,21 @@ export function NotificationProvider({ children }: Props) {
             millisecond: 0,
         });
 
+        Notifications.dismissAllNotificationsAsync();
+        Notifications.getAllScheduledNotificationsAsync().then(
+            (notifications) => {
+                const identifier = notifyTrigger.toFormat('yyyy-MM-dd');
+
+                notifications.forEach((notification) => {
+                    if (notification.identifier.includes(identifier)) {
+                        Notifications.cancelScheduledNotificationAsync(
+                            notification.identifier,
+                        );
+                    }
+                });
+            },
+        );
+
         schedulePunchNotification(index as 0 | 1 | 2 | 3, notifyTrigger);
     }
 
