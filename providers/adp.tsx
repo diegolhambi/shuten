@@ -183,32 +183,28 @@ export function AdpProvider({ children }: Props) {
         }
     });
 
-    function doLogin() {
-        const initial = DateTime.now().toMillis();
-        setLogged(false);
-
-        login(config.adp.user, config.adp.password).then((result) => {
-            const time = DateTime.now().toMillis() - initial;
-
-            switch (result) {
-                case 'Success':
-                    toast.show(`Logged in ADP in ${time}ms`);
-                    setLogged(true);
-                    break;
-                case 'InvalidCredentials':
-                    toast.show('Invalid credentials');
-                    break;
-                case 'SessionIdNotFound':
-                    toast.show('Session ID not found');
-                    break;
-                default:
-                    toast.show('Error');
-                    break;
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (initialized.current) {
+                revalidateClient();
             }
-        });
-    }
+        }, 3600000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [config]);
 
     useEffect(() => {
+        if (initialized.current) {
+            return;
+        }
+
+        initialized.current = true;
+        revalidateClient();
+    }, [config, revalidate.current]);
+
+    function revalidateClient() {
         if (config.adp.activated === false) {
             return;
         }
@@ -217,11 +213,6 @@ export function AdpProvider({ children }: Props) {
             return;
         }
 
-        if (initialized.current) {
-            return;
-        }
-
-        initialized.current = true;
         setLogged(false);
 
         const initial = DateTime.now().toMillis();
@@ -271,7 +262,32 @@ export function AdpProvider({ children }: Props) {
 
             setLogged(true);
         });
-    }, [config, revalidate.current]);
+    }
+
+    function doLogin() {
+        const initial = DateTime.now().toMillis();
+        setLogged(false);
+
+        login(config.adp.user, config.adp.password).then((result) => {
+            const time = DateTime.now().toMillis() - initial;
+
+            switch (result) {
+                case 'Success':
+                    toast.show(`Logged in ADP in ${time}ms`);
+                    setLogged(true);
+                    break;
+                case 'InvalidCredentials':
+                    toast.show('Invalid credentials');
+                    break;
+                case 'SessionIdNotFound':
+                    toast.show('Session ID not found');
+                    break;
+                default:
+                    toast.show('Error');
+                    break;
+            }
+        });
+    }
 
     async function punch() {
         if (!config.adp.activated) {
