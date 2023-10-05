@@ -223,6 +223,8 @@ export function NotificationProvider({ children }: Props) {
 
         const index = punches.findIndex((punch) => punch.predicted);
 
+        Notifications.dismissAllNotificationsAsync();
+
         if (index === -1) {
             return;
         }
@@ -248,10 +250,9 @@ export function NotificationProvider({ children }: Props) {
             millisecond: 0,
         });
 
-        Notifications.dismissAllNotificationsAsync();
         Notifications.getAllScheduledNotificationsAsync().then(
             (notifications) => {
-                const identifier = notifyTrigger.toFormat('yyyy-MM-dd');
+                const identifier = dateTime.split(' ')[0]!;
 
                 notifications.forEach((notification) => {
                     if (notification.identifier.includes(identifier)) {
