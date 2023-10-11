@@ -28,7 +28,7 @@ export default {
         adaptiveIcon: {
             foregroundImage: './assets/images/adaptive-icon.png',
             monochromeImage: './assets/images/adaptive-icon-mono.png',
-            backgroundColor: '#44bac9',
+            backgroundColor: IS_DEV ? '#ec522c' : '#44bac9',
         },
         package: IS_DEV ? 'com.daigou.shuten.dev' : 'com.daigou.shuten',
     },
