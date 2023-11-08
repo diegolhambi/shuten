@@ -15,11 +15,13 @@ import { Platform } from 'react-native';
 
 import { useForeground } from '../utils/app-state';
 import { storage } from '../utils/storage';
+import { SchemaGetPunchIn } from '../validations/get-punch-in';
+import { SchemaPostPunchIn } from '../validations/post-punch-in';
 import ConfigContext from './config';
 
 type AdpContextData = {
     login(user: string, password: string): Promise<LoginResult>;
-    test(): Promise<void>;
+    punches(): Promise<DateTime[] | undefined>;
     punch(): Promise<void>;
 };
 
@@ -308,23 +310,17 @@ export function AdpProvider({ children }: Props) {
                 punchAction: null,
             });
 
-            // response 200
-            /* data:
-            { 
-                "punchType": "SPDesktop", 
-                "punchLatitude": null, 
-                "punchLongitude": null, 
-                "punchAction": null, 
-                "punchDateTime": "2023-09-26T16:01:59.462+00:00", 
-                "punchTimezone": "-180" 
-            }
-
-            */
-
             if (isLoggedOut(result.headers)) {
                 toast.show('Punch not registered in ADP');
                 return;
             }
+
+            if (result.status !== 200) {
+                toast.show('Punch not registered in ADP');
+                return;
+            }
+
+            SchemaPostPunchIn.parse(result.data);
 
             toast.show('Punched in', {
                 message: `In ${DateTime.now().toMillis() - initial}ms`,
@@ -336,14 +332,13 @@ export function AdpProvider({ children }: Props) {
         }
     }
 
-    async function test() {
+    async function punches() {
         if (!client) {
             toast.show('Punch not registered in ADP');
             return;
         }
 
         try {
-            const initial = DateTime.now().toMillis();
             const result = await client.get('punch/punchin');
 
             if (isLoggedOut(result.headers)) {
@@ -352,10 +347,13 @@ export function AdpProvider({ children }: Props) {
                 return;
             }
 
-            toast.show('Punched in', {
-                // eslint-disable-next-line prettier/prettier
-                message: `In ${DateTime.now().toMillis() - initial}ms ${JSON.stringify(result.data)}`,
+            const data = SchemaGetPunchIn.parse(result.data);
+
+            const punches = data.lastPunches.map((punch) => {
+                return DateTime.fromISO(punch.punchDateTime);
             });
+
+            return punches;
         } catch (error) {
             toast.show('Error', {
                 message: JSON.stringify(error),
@@ -366,7 +364,7 @@ export function AdpProvider({ children }: Props) {
     const contextValue: AdpContextData = useMemo(() => {
         return {
             login,
-            test,
+            punches,
             punch,
         };
     }, [config.adp.activated, logged]);

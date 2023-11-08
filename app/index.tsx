@@ -260,7 +260,6 @@ export default function Home() {
                             size="$2"
                             icon={<MailCheck />}
                             onPress={() => {
-                                adp.test();
                                 //toast.show('Not implemented yet');
                             }}
                         />
@@ -316,6 +315,14 @@ export default function Home() {
                     }}
                 >
                     Add punch
+                </Menu.Item>
+                <Menu.Item
+                    onPress={() => {
+                        setOpenMenu(false);
+                        router.push('/adp-punches');
+                    }}
+                >
+                    List ADP punches
                 </Menu.Item>
                 {devMode ? (
                     <>
