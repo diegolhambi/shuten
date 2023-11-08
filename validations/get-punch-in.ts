@@ -21,10 +21,12 @@ export const SchemaGetPunchIn = z.object({
             createdAt: z.string(),
             updatedAt: z.string(),
             __v: z.number(),
-            importResult: z.object({
-                hash: z.string(),
-                message: z.string(),
-            }),
+            importResult: z
+                .object({
+                    hash: z.string(),
+                    message: z.string(),
+                })
+                .optional(),
         }),
     ),
 });
