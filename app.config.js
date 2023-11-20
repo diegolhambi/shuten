@@ -8,6 +8,10 @@ export default {
     icon: './assets/images/icon.png',
     scheme: 'shuten',
     userInterfaceStyle: 'automatic',
+    notification: {
+        icon: './assets/images/notification.png',
+        color: '#ffffff',
+    },
     splash: {
         image: './assets/images/splash.png',
         resizeMode: 'contain',
