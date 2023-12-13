@@ -35,7 +35,9 @@ type LoginResult =
     | 'Success'
     | 'Error'
     | 'InvalidCredentials'
-    | 'SessionIdNotFound';
+    | 'SessionIdNotFound'
+    | 'PasswordWillExpire'
+    | 'PasswordExpired';
 
 const defaultHeaders: RawAxiosRequestHeaders = {
     'Accept-Language': 'pt-BR,pt;q=0.9',
@@ -104,7 +106,7 @@ async function login(user: string, password: string): Promise<LoginResult> {
         // GET https://expert.brasil.adp.com/redirect/findway/ 302 >
         // GET https://expert.brasil.adp.com/expert/ 302 >
         // GET https://expert.brasil.adp.com/expert/v4/?lp=true 200
-        const htmlLogin = await client.post<string>(
+        let htmlLogin = await client.post<string>(
             'https://expert.brasil.adp.com/ipclogin/1/loginform.fcc',
             qs.stringify({
                 USER: user,
@@ -134,6 +136,16 @@ async function login(user: string, password: string): Promise<LoginResult> {
             return 'InvalidCredentials';
         }
 
+        const passwordFind =
+            /<p>Sua senha irá expirar em menos de (\d+) dias.<\/p>/;
+        const matchPassword = passwordFind.exec(htmlLogin.data);
+        let passwordWillExpire = false;
+
+        if (matchPassword && matchPassword.length > 1) {
+            passwordWillExpire = true;
+            htmlLogin = await client.get<string>('?lp=true');
+        }
+
         const regexPattern =
             /<input\s+id="newexpert_sessionid"\s+type="hidden"\s+value="([^"]+)"/;
         const match = regexPattern.exec(htmlLogin.data);
@@ -157,6 +169,10 @@ async function login(user: string, password: string): Promise<LoginResult> {
                 DateTime.now().plus({ hours: 2 }).toUnixInteger(),
             );
             storage.set('adp_newexpert_sessionid', sessionId);
+
+            if (passwordWillExpire) {
+                return 'PasswordWillExpire';
+            }
 
             return 'Success';
         } else {
@@ -283,6 +299,12 @@ export function AdpProvider({ children }: Props) {
                     break;
                 case 'SessionIdNotFound':
                     toast.show('Session ID not found');
+                    break;
+                case 'PasswordWillExpire':
+                    toast.show('ADP Password will expire soon');
+                    break;
+                case 'PasswordExpired':
+                    toast.show('Password expired');
                     break;
                 default:
                     toast.show('Error');
