@@ -74,7 +74,7 @@ function HoursWorked(props: HoursWorkedProps) {
 
     function openDateTimePicker(index: number) {
         setDatePickerValue(
-            DateTime.fromFormat(value.punches[index]!, 'HH:mm').toJSDate(),
+            DateTime.fromFormat(value.punches[index]!, 'HH:mm').toJSDate()
         );
         indexEditing.current = index;
     }
@@ -96,7 +96,7 @@ function HoursWorked(props: HoursWorkedProps) {
             const newDurations: string[] = [];
             for (let i = 0; i < newPunches.length - 1; i++) {
                 const duration = ParseTime(newPunches[i + 1]!).diff(
-                    ParseTime(newPunches[i]!),
+                    ParseTime(newPunches[i]!)
                 );
 
                 newDurations.push(duration.rescale().toString()!);
@@ -165,14 +165,14 @@ function ConfigHours() {
             }
 
             const test = Object.values(config.hoursToWork).filter(
-                (value) => value.punches.length > 0,
+                (value) => value.punches.length > 0
             );
 
             const firstObject = JSON.stringify(test[0]);
             return test.every(
-                (element) => JSON.stringify(element) === firstObject,
+                (element) => JSON.stringify(element) === firstObject
             );
-        },
+        }
     );
 
     function updateWeekdays(value: string[]) {
@@ -188,7 +188,7 @@ function ConfigHours() {
 
         if (sameForAllWeekdays) {
             const hoursToWork = Object.values(newHoursToWork).find(
-                (value) => value.punches.length > 0,
+                (value) => value.punches.length > 0
             );
 
             setInitialValue(hoursToWork!);
@@ -277,10 +277,7 @@ function ConfigHours() {
                 backgroundColor="$false"
             >
                 {listWeekdays.map((value) => (
-                    <ToggleGroup.Item
-                        key={`${value}`}
-                        value={`${value}`}
-                    >
+                    <ToggleGroup.Item key={`${value}`} value={`${value}`}>
                         <SizableText>{textWeekdays.short[value]}</SizableText>
                     </ToggleGroup.Item>
                 ))}
@@ -288,10 +285,7 @@ function ConfigHours() {
 
             <H4>Work hours</H4>
 
-            <XStack
-                space="$3"
-                alignItems="center"
-            >
+            <XStack space="$3" alignItems="center">
                 <AppSwitch
                     id="same-for-all-weeks"
                     size="$3"
@@ -318,10 +312,7 @@ function ConfigHours() {
                         return null;
                     }
                     return (
-                        <YStack
-                            space="$4"
-                            key={`weekday-${weekday}`}
-                        >
+                        <YStack space="$4" key={`weekday-${weekday}`}>
                             <H5>{textWeekdays.long[weekday]}</H5>
 
                             <HoursWorked
@@ -350,10 +341,7 @@ export default function Hours() {
                 }}
             />
             <ScrollView>
-                <YStack
-                    space="$4"
-                    p="$4"
-                >
+                <YStack space="$4" p="$4">
                     <ConfigHours />
                 </YStack>
             </ScrollView>

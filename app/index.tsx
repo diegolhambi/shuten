@@ -1,7 +1,7 @@
 import { Clock, MailCheck, MoreVertical } from '@tamagui/lucide-icons';
 import { useToastController } from '@tamagui/toast';
 import * as NavigationBar from 'expo-navigation-bar';
-import { router, SplashScreen, useFocusEffect } from 'expo-router';
+import { router, useFocusEffect } from 'expo-router';
 import { ResultSet, SQLError } from 'expo-sqlite';
 import * as SystemUI from 'expo-system-ui';
 import { DateTime } from 'luxon';
@@ -49,7 +49,7 @@ export default function Home() {
 
     const [today, setToday] = useState(DateTime.now());
     const [todayIso, setTodayIso] = useState(
-        DateTime.now().toISODate() as string,
+        DateTime.now().toISODate() as string
     );
     const [fetchedPunches, setFetchedPunches] = useState(0);
     const [openMenu, setOpenMenu] = useState(false);
@@ -58,7 +58,7 @@ export default function Home() {
 
     const data = useMemo(
         () => days(config.firstDayOfMonth),
-        [JSON.stringify(config)],
+        [JSON.stringify(config)]
     );
     const initialIndex = useMemo(() => {
         const index = indexToday(config.firstDayOfMonth) - 3;
@@ -98,7 +98,7 @@ export default function Home() {
 
                 notification.scheduleFirstPunch(PUNCHES);
             });
-        }, [fetchedPunches]),
+        }, [fetchedPunches])
     );
 
     useFocusEffect(
@@ -110,7 +110,7 @@ export default function Home() {
             }
 
             NavigationBar.setBackgroundColorAsync(theme.backgroundHover.val);
-        }, []),
+        }, [])
     );
 
     useEffect(() => {
@@ -178,7 +178,7 @@ export default function Home() {
                     DATE(date) as date,
                     strftime('%H:%M', date) as time,
                     type
-                from punches`,
+                from punches`
             )) as ResultSet;
 
             for (const item of result.rows) {
@@ -208,7 +208,7 @@ export default function Home() {
             (error: SQLError) => {
                 if (
                     error.message.includes(
-                        'UNIQUE constraint failed: punches.date',
+                        'UNIQUE constraint failed: punches.date'
                     )
                 ) {
                     toast.show('Duplicate entry detected', {
@@ -225,9 +225,9 @@ export default function Home() {
 
                 notification.scheduleNext(
                     value,
-                    getPunches(value.split(' ')[0]!),
+                    getPunches(value.split(' ')[0]!)
                 );
-            },
+            }
         );
     }
 
@@ -251,11 +251,7 @@ export default function Home() {
                     />
                 </XStack>
                 {devMode ? (
-                    <XStack
-                        space="$1"
-                        alignItems="center"
-                        flexShrink={1}
-                    >
+                    <XStack space="$1" alignItems="center" flexShrink={1}>
                         <Button
                             size="$2"
                             icon={<MailCheck />}
@@ -268,7 +264,7 @@ export default function Home() {
                             icon={<Clock />}
                             onPress={() =>
                                 setDevDate(
-                                    DateTime.now().toFormat('yyyy-MM-dd HH:mm'),
+                                    DateTime.now().toFormat('yyyy-MM-dd HH:mm')
                                 )
                             }
                         />
@@ -305,10 +301,7 @@ export default function Home() {
                 />
             </BottomBar>
             <BottomAreaView />
-            <Menu
-                open={openMenu}
-                onOpenChange={setOpenMenu}
-            >
+            <Menu open={openMenu} onOpenChange={setOpenMenu}>
                 <Menu.Item
                     onPress={() => {
                         toast.show('To do');
@@ -329,7 +322,7 @@ export default function Home() {
                         <Menu.Item
                             onPress={() => {
                                 db.transaction((tx) =>
-                                    tx.executeSql('DELETE FROM punches'),
+                                    tx.executeSql('DELETE FROM punches')
                                 );
                                 databasePunches();
                             }}
@@ -339,7 +332,7 @@ export default function Home() {
                         <Menu.Item
                             onPress={() => {
                                 router.push(
-                                    '/settings/scheduled-notifications',
+                                    '/settings/scheduled-notifications'
                                 );
                                 setOpenMenu(false);
                             }}

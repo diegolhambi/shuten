@@ -10,10 +10,7 @@ function ConfigItem({
     ...rest
 }: XStackProps & { title: string; subTitle?: string }) {
     return (
-        <Item
-            pressable
-            {...rest}
-        >
+        <Item pressable {...rest}>
             <Item.FrameText>
                 <Item.Title>{title}</Item.Title>
                 {subTitle && <Item.SubTitle>{subTitle}</Item.SubTitle>}

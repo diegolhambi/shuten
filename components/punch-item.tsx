@@ -176,14 +176,11 @@ export default function PunchItem(props: PunchItemProps) {
                                     >
                                         {hoursDiff(
                                             (punches[index - 1] as Punch).time,
-                                            punch.time,
+                                            punch.time
                                         )}
                                     </TimeInterval>
                                 )}
-                                <Time
-                                    punch={punch}
-                                    index={index}
-                                />
+                                <Time punch={punch} index={index} />
                             </React.Fragment>
                         );
                     })

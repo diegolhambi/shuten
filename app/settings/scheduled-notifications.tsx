@@ -14,7 +14,7 @@ export default function ScheduledNotifications() {
         Notifications.getAllScheduledNotificationsAsync().then(
             (notifications) => {
                 setNotifications(notifications);
-            },
+            }
         );
     }, [DateTime.now().toSeconds()]);
 
@@ -36,10 +36,7 @@ export default function ScheduledNotifications() {
             <FlatList
                 data={notifications}
                 renderItem={({ item }) => (
-                    <YStack
-                        key={item.identifier}
-                        mb="$4"
-                    >
+                    <YStack key={item.identifier} mb="$4">
                         <SizableText>{item.identifier}</SizableText>
                         <SizableText>{item.content.title}</SizableText>
                         <SizableText>{item.content.body}</SizableText>

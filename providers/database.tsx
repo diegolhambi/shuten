@@ -18,10 +18,10 @@ export function DatabaseProvider({ children }: Props) {
         db.transaction((tx) => {
             //tx.executeSql('DELETE FROM punches;');
             tx.executeSql(
-                'CREATE TABLE IF NOT EXISTS punches (date DATE UNIQUE, type TEXT);',
+                'CREATE TABLE IF NOT EXISTS punches (date DATE UNIQUE, type TEXT);'
             );
             tx.executeSql(
-                'CREATE INDEX IF NOT EXISTS idx_punches_date ON punches(date);',
+                'CREATE INDEX IF NOT EXISTS idx_punches_date ON punches(date);'
             );
         });
     }, []);

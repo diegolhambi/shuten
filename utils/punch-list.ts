@@ -5,7 +5,7 @@ import { Punch } from '../types/punch';
 import { Weekday } from './date';
 
 export function monthDaysRange(
-    firstDay: number,
+    firstDay: number
 ): [initialDate: DateTime, finalDate: DateTime] {
     const today = DateTime.now();
 
@@ -90,13 +90,13 @@ export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
         }
 
         const firstPeriod = Duration.fromISO(
-            configHours.durations[0] as string,
+            configHours.durations[0] as string
         );
         const lunchPeriod = Duration.fromISO(
-            configHours.durations[1] as string,
+            configHours.durations[1] as string
         );
         const secondPeriod = Duration.fromISO(
-            configHours.durations[configHours.durations.length - 1] as string,
+            configHours.durations[configHours.durations.length - 1] as string
         );
 
         const workDuration = firstPeriod.plus(secondPeriod);
@@ -116,7 +116,7 @@ export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
                     type: 'punch',
                     time: DateTime.fromFormat(
                         (listPunches[index - 1] as Punch).time,
-                        'HH:mm',
+                        'HH:mm'
                     )
                         .plus(lunchPeriod)
                         .toFormat('HH:mm'),
@@ -128,15 +128,15 @@ export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
             if (index === 3 && listPunches.at(2)) {
                 const enter = DateTime.fromFormat(
                     (listPunches[0] as Punch).time,
-                    'HH:mm',
+                    'HH:mm'
                 );
                 const lunchOut = DateTime.fromFormat(
                     (listPunches[1] as Punch).time,
-                    'HH:mm',
+                    'HH:mm'
                 );
                 const lunchIn = DateTime.fromFormat(
                     (listPunches[2] as Punch).time,
-                    'HH:mm',
+                    'HH:mm'
                 );
 
                 calculatedPunches.push({
@@ -154,7 +154,7 @@ export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
                     type: 'punch',
                     time: DateTime.fromFormat(
                         (listPunches[0] as Punch).time,
-                        'HH:mm',
+                        'HH:mm'
                     )
                         .plus(workDuration)
                         .plus(lunchPeriod)

@@ -4,13 +4,7 @@ import { YStack } from 'tamagui';
 
 export const SafeToastViewport = () => {
     const { left, top, right } = useSafeAreaInsets();
-    return (
-        <ToastViewport
-            top={top + 5}
-            left={left}
-            right={right}
-        />
-    );
+    return <ToastViewport top={top + 5} left={left} right={right} />;
 };
 
 export const CustomToast = () => {

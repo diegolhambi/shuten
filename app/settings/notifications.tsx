@@ -60,7 +60,7 @@ export default function Notifications() {
                 },
             });
         },
-        [config],
+        [config]
     );
 
     return (
@@ -152,10 +152,7 @@ export default function Notifications() {
                 checked={config.notification[3].early}
                 onCheckedChange={(value) => handleChange(3, 'early', value)}
             />
-            <XStack
-                w="100%"
-                h={bottom}
-            />
+            <XStack w="100%" h={bottom} />
         </ScrollView>
     );
 }

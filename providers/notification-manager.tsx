@@ -21,7 +21,7 @@ type NotificationManagerContextData = {
 };
 
 const NotificationContext = createContext<NotificationManagerContextData>(
-    {} as NotificationManagerContextData,
+    {} as NotificationManagerContextData
 );
 
 type Props = {
@@ -105,7 +105,7 @@ export function NotificationProvider({ children }: Props) {
             Notifications.addNotificationResponseReceivedListener(
                 (response) => {
                     console.log(response);
-                },
+                }
             );
 
         return () => {
@@ -136,11 +136,11 @@ export function NotificationProvider({ children }: Props) {
                     title: textEarlyNotifications[punch].title,
                     body: textEarlyNotifications[punch].body.replace(
                         '%',
-                        `${config.notification.howEarly}`,
+                        `${config.notification.howEarly}`
                     ),
                 },
                 identifier: `punch_${punch}_${notifyEarlyTrigger.toFormat(
-                    'yyyy-MM-dd_HH-mm',
+                    'yyyy-MM-dd_HH-mm'
                 )}`,
                 trigger: notifyEarlyTrigger.toJSDate(),
             });
@@ -153,7 +153,7 @@ export function NotificationProvider({ children }: Props) {
                     ...textNotications[punch],
                 },
                 identifier: `punch_${punch}_${time.toFormat(
-                    'yyyy-MM-dd_HH-mm',
+                    'yyyy-MM-dd_HH-mm'
                 )}`,
                 trigger: time.toJSDate(),
             });
@@ -242,7 +242,7 @@ export function NotificationProvider({ children }: Props) {
 
         const notifyTrigger = DateTime.fromFormat(
             dateTime,
-            'yyyy-LL-dd HH:mm',
+            'yyyy-LL-dd HH:mm'
         ).set({
             hour: +hour,
             minute: +minute,
@@ -257,11 +257,11 @@ export function NotificationProvider({ children }: Props) {
                 notifications.forEach((notification) => {
                     if (notification.identifier.includes(identifier)) {
                         Notifications.cancelScheduledNotificationAsync(
-                            notification.identifier,
+                            notification.identifier
                         );
                     }
                 });
-            },
+            }
         );
 
         schedulePunchNotification(index as 0 | 1 | 2 | 3, notifyTrigger);
@@ -274,7 +274,7 @@ export function NotificationProvider({ children }: Props) {
             scheduleFirstPunch,
             scheduleNext,
         }),
-        [granted, config],
+        [granted, config]
     );
 
     return (

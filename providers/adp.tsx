@@ -68,7 +68,7 @@ client.interceptors.response.use(
     (error) => {
         console.log(error);
         return Promise.reject(error);
-    },
+    }
 );
 
 function loggedHeaders(sessionId: string): RawAxiosRequestHeaders {
@@ -112,7 +112,7 @@ async function login(user: string, password: string): Promise<LoginResult> {
                 USER: user,
                 PASSWORD: password,
                 TARGET: '-SM-https%3A%2F%2Fexpert.brasil.adp.com%2Fredirect%2Ffindway%2F',
-            }),
+            })
         );
         /*
         console.log(htmlLogin.headers);
@@ -129,7 +129,7 @@ async function login(user: string, password: string): Promise<LoginResult> {
         */
         if (
             htmlLogin.data.indexOf(
-                'Por favor, corrija suas credenciais de login e tente novamente',
+                'Por favor, corrija suas credenciais de login e tente novamente'
             ) !== -1 ||
             htmlLogin.headers['content-location'] === 'loginform.html.pt-br'
         ) {
@@ -166,7 +166,7 @@ async function login(user: string, password: string): Promise<LoginResult> {
 
             storage.set(
                 'adp_session_expires',
-                DateTime.now().plus({ hours: 2 }).toUnixInteger(),
+                DateTime.now().plus({ hours: 2 }).toUnixInteger()
             );
             storage.set('adp_newexpert_sessionid', sessionId);
 

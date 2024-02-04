@@ -48,30 +48,26 @@ function RootLayoutNav() {
     const colorScheme = useColorScheme();
 
     return (
-        <TamaguiProvider
-        config={config}
-        defaultTheme={colorScheme as any}
-    >
-        <ToastProvider
-            swipeDirection="horizontal"
-            duration={6000}
-        >
-            <ThemeProvider
-                value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
-            >
-                <ConfigProvider>
-                    <DatabaseProvider>
-                        <NotificationProvider>
-                            <AdpProvider>
-                                <Stack screenOptions={{ headerShown: false }} />
-                            </AdpProvider>
-                        </NotificationProvider>
-                    </DatabaseProvider>
-                </ConfigProvider>
-                <CustomToast />
-                <SafeToastViewport />
-            </ThemeProvider>
-        </ToastProvider>
-    </TamaguiProvider>
+        <TamaguiProvider config={config} defaultTheme={colorScheme as any}>
+            <ToastProvider swipeDirection="horizontal" duration={6000}>
+                <ThemeProvider
+                    value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
+                >
+                    <ConfigProvider>
+                        <DatabaseProvider>
+                            <NotificationProvider>
+                                <AdpProvider>
+                                    <Stack
+                                        screenOptions={{ headerShown: false }}
+                                    />
+                                </AdpProvider>
+                            </NotificationProvider>
+                        </DatabaseProvider>
+                    </ConfigProvider>
+                    <CustomToast />
+                    <SafeToastViewport />
+                </ThemeProvider>
+            </ToastProvider>
+        </TamaguiProvider>
     );
 }

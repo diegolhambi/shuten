@@ -32,19 +32,10 @@ function Menu(props: SheetProps) {
     const insets = useSafeAreaInsets();
 
     return (
-        <Sheet
-            modal
-            dismissOnSnapToBottom
-            open
-            snapPointsMode="fit"
-            {...props}
-        >
+        <Sheet modal dismissOnSnapToBottom open snapPointsMode="fit" {...props}>
             <Sheet.Overlay />
             <Sheet.Handle />
-            <Sheet.Frame
-                space="$1"
-                pb={insets.bottom}
-            >
+            <Sheet.Frame space="$1" pb={insets.bottom}>
                 {props.children}
             </Sheet.Frame>
         </Sheet>

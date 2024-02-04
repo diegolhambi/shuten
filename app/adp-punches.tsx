@@ -32,18 +32,14 @@ export default function ScheduledNotifications() {
             <FlatList
                 data={punches}
                 renderItem={({ item }) => (
-                    <YStack
-                        key={item.toISO()}
-                        px="$2"
-                        m="$4"
-                    >
+                    <YStack key={item.toISO()} px="$2" m="$4">
                         <SizableText size="$6">
                             {item.toISODate()}
                             {` `}
                             {item.toLocaleString(
                                 is24hourClock()
                                     ? DateTime.TIME_24_SIMPLE
-                                    : DateTime.TIME_SIMPLE,
+                                    : DateTime.TIME_SIMPLE
                             )}
                         </SizableText>
                     </YStack>

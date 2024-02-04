@@ -99,7 +99,7 @@ if (!storage.contains('config')) {
 
 export function ConfigProvider({ children }: ConfigProviderProps) {
     const [config, setConfig] = useState<Config>(
-        JSON.parse(storage.getString('config')!),
+        JSON.parse(storage.getString('config')!)
     );
 
     function updateConfig(newConfig: Config) {
@@ -109,7 +109,7 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
 
     const contextValue = useMemo(
         () => ({ config, setConfig: updateConfig }),
-        [config],
+        [config]
     );
 
     return (

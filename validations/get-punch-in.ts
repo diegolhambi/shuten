@@ -27,7 +27,7 @@ export const SchemaGetPunchIn = z.object({
                     message: z.string(),
                 })
                 .optional(),
-        }),
+        })
     ),
 });
 

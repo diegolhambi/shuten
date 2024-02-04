@@ -110,10 +110,7 @@ export default function Adp() {
                     </AppSwitch>
                 </Item.FrameIcon>
             </Item>
-            <YStack
-                p="$4"
-                space="$4"
-            >
+            <YStack p="$4" space="$4">
                 <SizableText size="$7">Credentials</SizableText>
                 <YStack space="$2">
                     <Label>Username</Label>
@@ -134,10 +131,7 @@ export default function Adp() {
                         onChangeText={setPassword}
                     />
                 </YStack>
-                <XStack
-                    space="$2"
-                    alignItems="center"
-                >
+                <XStack space="$2" alignItems="center">
                     <AppSwitch
                         onCheckedChange={() => setShowPassword(!showPassword)}
                         size="$3"
