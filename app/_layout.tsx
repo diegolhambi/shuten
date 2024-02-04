@@ -14,7 +14,10 @@ import { AdpProvider } from '../providers/adp';
 import { ConfigProvider } from '../providers/config';
 import { DatabaseProvider } from '../providers/database';
 import { NotificationProvider } from '../providers/notification-manager';
-import { Provider } from '../providers/provider';
+import { config } from '../tamagui.config';
+import { TamaguiProvider } from 'tamagui';
+import { ToastProvider } from '@tamagui/toast';
+import { CustomToast, SafeToastViewport } from '../components/toast';
 
 export const unstable_settings = {
     // Ensure that reloading on `/modal` keeps a back button present.
@@ -48,7 +51,14 @@ function RootLayoutNav() {
     const colorScheme = useColorScheme();
 
     return (
-        <Provider defaultTheme={colorScheme === 'dark' ? 'dark' : 'light'}>
+        <TamaguiProvider
+        config={config}
+        defaultTheme={colorScheme as any}
+    >
+        <ToastProvider
+            swipeDirection="horizontal"
+            duration={6000}
+        >
             <ThemeProvider
                 value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}
             >
@@ -61,7 +71,10 @@ function RootLayoutNav() {
                         </NotificationProvider>
                     </DatabaseProvider>
                 </ConfigProvider>
+                <CustomToast />
+                <SafeToastViewport />
             </ThemeProvider>
-        </Provider>
+        </ToastProvider>
+    </TamaguiProvider>
     );
 }
