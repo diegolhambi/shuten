@@ -24,9 +24,6 @@ export const unstable_settings = {
     initialRouteName: 'index',
 };
 
-// Prevent the splash screen from auto-hiding before asset loading is complete.
-SplashScreen.preventAutoHideAsync();
-
 export default function RootLayout() {
     const [loaded, error] = useFonts({
         Inter: require('@tamagui/font-inter/otf/Inter-Medium.otf'),

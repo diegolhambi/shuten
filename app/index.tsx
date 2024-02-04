@@ -232,7 +232,7 @@ export default function Home() {
     }
 
     return (
-        <AreaView onLayout={() => SplashScreen.hideAsync()}>
+        <AreaView>
             <FlatList
                 data={data}
                 initialNumToRender={15}
