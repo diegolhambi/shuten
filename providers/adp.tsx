@@ -175,9 +175,9 @@ async function login(user: string, password: string): Promise<LoginResult> {
             }
 
             return 'Success';
-        } else {
-            return 'SessionIdNotFound';
         }
+
+        return 'SessionIdNotFound';
     } catch (error) {
         cleanSession();
         console.log('Adp login error', error);
@@ -192,20 +192,14 @@ export function AdpProvider({ children }: Props) {
     const [logged, setLogged] = useState(false);
 
     const initialized = useRef(false);
-    const revalidate = useRef(0);
 
     useForeground(() => {
-        if (initialized.current) {
-            initialized.current = false;
-            revalidate.current++;
-        }
+        revalidateClient();
     });
 
     useEffect(() => {
         const interval = setInterval(() => {
-            if (initialized.current) {
-                revalidateClient();
-            }
+            revalidateClient();
         }, 3600000);
 
         return () => {
@@ -220,7 +214,7 @@ export function AdpProvider({ children }: Props) {
 
         initialized.current = true;
         revalidateClient();
-    }, [config, revalidate.current]);
+    }, [config]);
 
     function revalidateClient() {
         if (config.adp.activated === false) {
@@ -282,38 +276,46 @@ export function AdpProvider({ children }: Props) {
         });
     }
 
-    function doLogin() {
-        const initial = DateTime.now().toMillis();
-        setLogged(false);
+    async function doLogin() {
+        return new Promise((resolve, reject) => {
+            const initial = DateTime.now().toMillis();
+            setLogged(false);
 
-        login(config.adp.user, config.adp.password).then((result) => {
-            const time = DateTime.now().toMillis() - initial;
+            login(config.adp.user, config.adp.password).then((result) => {
+                const time = DateTime.now().toMillis() - initial;
 
-            switch (result) {
-                case 'Success':
-                    toast.show(`Logged in ADP in ${time}ms`);
-                    setLogged(true);
-                    break;
-                case 'InvalidCredentials':
-                    toast.show('Invalid credentials');
-                    break;
-                case 'SessionIdNotFound':
-                    toast.show('Session ID not found');
-                    break;
-                case 'PasswordWillExpire':
-                    toast.show('ADP Password will expire soon');
-                    break;
-                case 'PasswordExpired':
-                    toast.show('Password expired');
-                    break;
-                default:
-                    toast.show('Error');
-                    break;
-            }
+                switch (result) {
+                    case 'Success':
+                        toast.show(`Logged in ADP in ${time}ms`);
+                        setLogged(true);
+                        resolve('Success');
+                        break;
+                    case 'InvalidCredentials':
+                        toast.show('Invalid credentials');
+                        resolve('InvalidCredentials');
+                        break;
+                    case 'SessionIdNotFound':
+                        toast.show('Session ID not found');
+                        resolve('SessionIdNotFound');
+                        break;
+                    case 'PasswordWillExpire':
+                        toast.show('ADP Password will expire soon');
+                        resolve('PasswordWillExpire');
+                        break;
+                    case 'PasswordExpired':
+                        toast.show('Password expired');
+                        resolve('PasswordExpired');
+                        break;
+                    default:
+                        toast.show('Error');
+                        reject('Error');
+                        break;
+                }
+            });
         });
     }
 
-    async function punch() {
+    async function punch(isRetry = false) {
         if (!config.adp.activated) {
             return;
         }
@@ -348,6 +350,18 @@ export function AdpProvider({ children }: Props) {
                 message: `In ${DateTime.now().toMillis() - initial}ms`,
             });
         } catch (error) {
+            if (!isRetry) {
+                const result = await doLogin();
+
+                if (result === 'Success') {
+                    return punch(true);
+                }
+
+                toast.show('Error', {
+                    message: JSON.stringify(error),
+                });
+            }
+
             toast.show('Error', {
                 message: JSON.stringify(error),
             });
