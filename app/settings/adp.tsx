@@ -134,7 +134,6 @@ export default function Adp() {
                 <XStack space="$2" alignItems="center">
                     <AppSwitch
                         onCheckedChange={() => setShowPassword(!showPassword)}
-                        size="$3"
                     >
                         <AppSwitch.Thumb />
                     </AppSwitch>
