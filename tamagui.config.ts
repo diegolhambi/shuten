@@ -1,6 +1,32 @@
 import { config as configBase } from '@tamagui/config';
 import { createTamagui } from 'tamagui';
-export const config = createTamagui(configBase);
+import { createInterFont } from '@tamagui/font-inter';
+
+const headingFont = createInterFont({
+    color: {
+        true: '$color',
+    },
+    face: {
+        700: { normal: 'InterBold' },
+    },
+});
+
+const bodyFont = createInterFont({
+    color: {
+        true: '$color',
+    },
+    face: {
+        700: { normal: 'InterBold' },
+    },
+});
+
+export const config = createTamagui({
+    ...configBase,
+    fonts: {
+        body: bodyFont,
+        heading: headingFont,
+    },
+});
 
 export default config;
 
