@@ -110,9 +110,9 @@ export default function Adp() {
                     </AppSwitch>
                 </Item.FrameIcon>
             </Item>
-            <YStack p="$4" space="$4">
+            <YStack p="$4" gap="$4">
                 <SizableText size="$7">Credentials</SizableText>
-                <YStack space="$2">
+                <YStack gap="$2">
                     <Label>Username</Label>
                     <Input
                         autoCapitalize="none"
@@ -121,7 +121,7 @@ export default function Adp() {
                         onChangeText={setUser}
                     />
                 </YStack>
-                <YStack space="$2">
+                <YStack gap="$2">
                     <Label>Password</Label>
                     <Input
                         autoCapitalize="none"
@@ -131,7 +131,7 @@ export default function Adp() {
                         onChangeText={setPassword}
                     />
                 </YStack>
-                <XStack space="$2" alignItems="center">
+                <XStack gap="$2" alignItems="center">
                     <AppSwitch
                         onCheckedChange={() => setShowPassword(!showPassword)}
                     >
@@ -139,11 +139,7 @@ export default function Adp() {
                     </AppSwitch>
                     <Label>Show password</Label>
                 </XStack>
-                <XStack
-                    space="$2"
-                    alignItems="center"
-                    justifyContent="flex-end"
-                >
+                <XStack gap="$2" alignItems="center" justifyContent="flex-end">
                     {testing ? (
                         <Button disabled>
                             <Spinner />

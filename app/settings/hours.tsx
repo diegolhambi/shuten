@@ -264,7 +264,7 @@ function ConfigHours() {
     }
 
     return (
-        <YStack space="$4">
+        <YStack gap="$4">
             <H4>Workdays</H4>
 
             <ToggleGroup
@@ -285,7 +285,7 @@ function ConfigHours() {
 
             <H4>Work hours</H4>
 
-            <XStack space="$3" alignItems="center">
+            <XStack gap="$3" alignItems="center">
                 <AppSwitch
                     id="same-for-all-weeks"
                     size="$3"
@@ -312,7 +312,7 @@ function ConfigHours() {
                         return null;
                     }
                     return (
-                        <YStack space="$4" key={`weekday-${weekday}`}>
+                        <YStack gap="$4" key={`weekday-${weekday}`}>
                             <H5>{textWeekdays.long[weekday]}</H5>
 
                             <HoursWorked
@@ -341,7 +341,7 @@ export default function Hours() {
                 }}
             />
             <ScrollView>
-                <YStack space="$4" p="$4">
+                <YStack gap="$4" p="$4">
                     <ConfigHours />
                 </YStack>
             </ScrollView>

@@ -35,7 +35,7 @@ function Menu(props: SheetProps) {
         <Sheet modal dismissOnSnapToBottom open snapPointsMode="fit" {...props}>
             <Sheet.Overlay />
             <Sheet.Handle />
-            <Sheet.Frame space="$1" pb={insets.bottom}>
+            <Sheet.Frame gap="$1" pb={insets.bottom}>
                 {props.children}
             </Sheet.Frame>
         </Sheet>

@@ -251,7 +251,7 @@ export default function Home() {
                     />
                 </XStack>
                 {devMode ? (
-                    <XStack space="$1" alignItems="center" flexShrink={1}>
+                    <XStack gap="$1" alignItems="center" flexShrink={1}>
                         <Button
                             size="$2"
                             icon={<MailCheck />}
