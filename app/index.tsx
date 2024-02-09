@@ -8,7 +8,7 @@ import { DateTime } from 'luxon';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, Vibration } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Input, styled, useTheme, XStack } from 'tamagui';
+import { Button, Input, XStack, styled, useTheme } from 'tamagui';
 
 import { BottomBar } from '../components/bottom-bar';
 import Date from '../components/clock';
@@ -19,7 +19,7 @@ import AdpContext from '../providers/adp';
 import ConfigContext from '../providers/config';
 import DatabaseContext from '../providers/database';
 import NotificationContext from '../providers/notification-manager';
-import { Punch } from '../types/punch';
+import { Punch, PunchType } from '../types/punch';
 import { Weekday } from '../utils/date';
 import { days, getDayPunches, indexToday } from '../utils/punch-list';
 
@@ -172,63 +172,59 @@ export default function Home() {
     async function databasePunches() {
         PUNCHES.clear();
 
-        return db.transactionAsync(async (tx) => {
-            const result = (await tx.executeSqlAsync(
-                `select 
+        const result: Array<{
+            date: string;
+            time: string;
+            type: PunchType;
+        }> = await db.getAllAsync(
+            `select 
                     DATE(date) as date,
                     strftime('%H:%M', date) as time,
                     type
                 from punches`
-            )) as ResultSet;
+        );
 
-            for (const item of result.rows) {
-                if (PUNCHES.has(item.date)) {
-                    const old = PUNCHES.get(item.date) || [];
-                    old.push({ time: item.time, type: item.type });
-                    PUNCHES.set(item.date, old);
-                    continue;
-                }
-
-                PUNCHES.set(item.date, [{ time: item.time, type: item.type }]);
+        for (const item of result) {
+            if (PUNCHES.has(item.date)) {
+                const old = PUNCHES.get(item.date) || [];
+                old.push({ time: item.time, type: item.type });
+                PUNCHES.set(item.date, old);
+                continue;
             }
 
-            setFetchedPunches(DateTime.now().toMillis());
-        }, true);
+            PUNCHES.set(item.date, [{ time: item.time, type: item.type }]);
+        }
+
+        setFetchedPunches(DateTime.now().toMillis());
     }
 
     async function insertPunch(dateTime?: string) {
         const value = dateTime || DateTime.now().toFormat('yyyy-LL-dd HH:mm');
 
-        db.transaction(
-            (tx) => {
-                tx.executeSql("INSERT INTO punches VALUES (?, 'punch');", [
-                    value,
-                ]);
-            },
-            (error: SQLError) => {
-                if (
-                    error.message.includes(
-                        'UNIQUE constraint failed: punches.date'
-                    )
-                ) {
-                    toast.show('Duplicate entry detected', {
-                        message: "You've already added a punch at this time.",
-                    });
-                } else {
-                    toast.show('Something went wrong', {
-                        message: error.message,
-                    });
-                }
-            },
-            async () => {
-                await databasePunches();
+        try {
+            await db.runAsync(`INSERT INTO punches VALUES (?, 'punch');`, [value]);
 
-                notification.scheduleNext(
-                    value,
-                    getPunches(value.split(' ')[0]!)
-                );
+            await databasePunches();
+
+            notification.scheduleNext(
+                value,
+                getPunches(value.split(' ')[0]!)
+            );
+
+        } catch (error: any) {
+            if (
+                error.message.includes('UNIQUE constraint failed: punches.date')
+            ) {
+                toast.show('Duplicate entry detected', {
+                    message: "You've already added a punch at this time.",
+                });
+            } else {
+                toast.show('Something went wrong', {
+                    message: error.message,
+                });
             }
-        );
+        }
+
     }
 
     return (
@@ -321,9 +317,7 @@ export default function Home() {
                     <>
                         <Menu.Item
                             onPress={() => {
-                                db.transaction((tx) =>
-                                    tx.executeSql('DELETE FROM punches')
-                                );
+                                db.runAsync('DELETE FROM punches');
                                 databasePunches();
                             }}
                         >
