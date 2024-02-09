@@ -20,11 +20,6 @@ import { TamaguiProvider } from 'tamagui';
 import { ToastProvider } from '@tamagui/toast';
 import { CustomToast, SafeToastViewport } from '../components/toast';
 
-// Thanks to https://github.com/tamagui/tamagui/issues/2042#issuecomment-1879261095
-LogBox.ignoreLogs([
-    'Warning: Cannot update a component (`Button`) while rendering a different component (`Theme`). To locate the bad setState() call inside `Theme`, follow the stack trace as described in https://react.dev/link/setstate-in-render'
-]);
-
 export const unstable_settings = {
     // Ensure that reloading on `/modal` keeps a back button present.
     initialRouteName: 'index',
