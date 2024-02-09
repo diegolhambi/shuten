@@ -5,8 +5,7 @@ import {
 } from '@tamagui/lucide-icons';
 import { useToastController } from '@tamagui/toast';
 import * as NavigationBar from 'expo-navigation-bar';
-import { router, useFocusEffect } from 'expo-router';
-import { ResultSet, SQLError } from 'expo-sqlite';
+import { SplashScreen, router, useFocusEffect } from 'expo-router';
 import * as SystemUI from 'expo-system-ui';
 import { DateTime } from 'luxon';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
@@ -229,7 +228,7 @@ export default function Home() {
     }
 
     return (
-        <AreaView>
+        <AreaView onLayout={() => SplashScreen.hideAsync()}>
             <FlatList
                 data={data}
                 initialNumToRender={15}
