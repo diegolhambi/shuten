@@ -1,4 +1,8 @@
-import { Clock, MailCheck, MoreVertical } from '@tamagui/lucide-icons';
+import {
+    Clock as ClockIcon,
+    MailCheck,
+    MoreVertical,
+} from '@tamagui/lucide-icons';
 import { useToastController } from '@tamagui/toast';
 import * as NavigationBar from 'expo-navigation-bar';
 import { router, useFocusEffect } from 'expo-router';
@@ -11,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Input, XStack, styled, useTheme } from 'tamagui';
 
 import { BottomBar } from '../components/bottom-bar';
-import Date from '../components/clock';
+import Clock from '../components/clock';
 import Menu from '../components/menu';
 import { PunchButton } from '../components/punch-button';
 import PunchItem from '../components/punch-item';
@@ -202,15 +206,13 @@ export default function Home() {
         const value = dateTime || DateTime.now().toFormat('yyyy-LL-dd HH:mm');
 
         try {
-            await db.runAsync(`INSERT INTO punches VALUES (?, 'punch');`, [value]);
+            await db.runAsync(`INSERT INTO punches VALUES (?, 'punch');`, [
+                value,
+            ]);
 
             await databasePunches();
 
-            notification.scheduleNext(
-                value,
-                getPunches(value.split(' ')[0]!)
-            );
-
+            notification.scheduleNext(value, getPunches(value.split(' ')[0]!));
         } catch (error: any) {
             if (
                 error.message.includes('UNIQUE constraint failed: punches.date')
@@ -224,7 +226,6 @@ export default function Home() {
                 });
             }
         }
-
     }
 
     return (
@@ -257,7 +258,7 @@ export default function Home() {
                         />
                         <Button
                             size="$2"
-                            icon={<Clock />}
+                            icon={<ClockIcon />}
                             onPress={() =>
                                 setDevDate(
                                     DateTime.now().toFormat('yyyy-MM-dd HH:mm')
@@ -271,7 +272,7 @@ export default function Home() {
                         />
                     </XStack>
                 ) : (
-                    <Date />
+                    <Clock />
                 )}
                 <PunchButton
                     onPressIn={() => {
