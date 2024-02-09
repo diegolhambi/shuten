@@ -14,10 +14,10 @@ export function monthDaysRange(
 
     if (today.day >= firstDay) {
         initalDate = today.set({ day: firstDay });
-        finalDate = initalDate.plus({ days: 30 });
+        finalDate = initalDate.plus({ days: 31 });
     } else {
         initalDate = today.minus({ month: 1 }).set({ day: firstDay });
-        finalDate = initalDate.plus({ days: 30 });
+        finalDate = initalDate.plus({ days: 31 });
     }
 
     return [initalDate, finalDate];
