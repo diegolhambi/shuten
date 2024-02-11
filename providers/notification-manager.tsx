@@ -8,7 +8,7 @@ import React, {
     useState,
 } from 'react';
 
-import { PunchesMap } from '@/(tabs)/punches-list';
+import { PunchesMap } from '@/app/(tabs)/punches-list';
 import { Punch } from '@/types/punch';
 import { Weekday } from '@/utils/date';
 import ConfigContext from './config';
