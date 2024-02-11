@@ -1,7 +1,7 @@
 import { DateTime, Duration } from 'luxon';
 
-import { Config } from '../providers/config';
-import { Punch } from '../types/punch';
+import { Config } from '@/providers/config';
+import { Punch } from '@/types/punch';
 import { Weekday } from './date';
 
 export function monthDaysRange(

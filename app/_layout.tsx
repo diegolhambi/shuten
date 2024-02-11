@@ -1,5 +1,4 @@
-import { LogBox } from 'react-native';
-import '../utils/storage';
+import '@/utils/storage';
 
 import {
     DarkTheme,
@@ -11,14 +10,19 @@ import { SplashScreen, Stack } from 'expo-router';
 import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 
-import { AdpProvider } from '../providers/adp';
-import { ConfigProvider } from '../providers/config';
-import { DatabaseProvider } from '../providers/database';
-import { NotificationProvider } from '../providers/notification-manager';
-import { config } from '../tamagui.config';
-import { TamaguiProvider } from 'tamagui';
+import { CustomToast, SafeToastViewport } from '@/components/toast';
+import { AdpProvider } from '@/providers/adp';
+import { ConfigProvider } from '@/providers/config';
+import { DatabaseProvider } from '@/providers/database';
+import { NotificationProvider } from '@/providers/notification-manager';
+import { config } from '@/tamagui.config';
 import { ToastProvider } from '@tamagui/toast';
-import { CustomToast, SafeToastViewport } from '../components/toast';
+import { TamaguiProvider } from 'tamagui';
+
+export {
+    // Catch any errors thrown by the Layout component.
+    ErrorBoundary,
+} from 'expo-router';
 
 export const unstable_settings = {
     // Ensure that reloading on `/modal` keeps a back button present.

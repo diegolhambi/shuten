@@ -16,17 +16,12 @@ import {
     YStack,
 } from 'tamagui';
 
-import { AppSwitch } from '../../components/app-switch';
+import { AppSwitch } from '@/components/app-switch';
 import ConfigContext, {
     defaultHourToWork,
     HoursToWork,
-} from '../../providers/config';
-import {
-    getWeekdays,
-    is24hourClock,
-    ParseTime,
-    Weekday,
-} from '../../utils/date';
+} from '@/providers/config';
+import { getWeekdays, is24hourClock, ParseTime, Weekday } from '@/utils/date';
 
 const textWeekdays = {
     short: getWeekdays(),

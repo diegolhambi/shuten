@@ -13,10 +13,10 @@ import React, {
 } from 'react';
 import { Platform } from 'react-native';
 
-import { useForeground } from '../utils/app-state';
-import { storage } from '../utils/storage';
-import { SchemaGetPunchIn } from '../validations/get-punch-in';
-import { SchemaPostPunchIn } from '../validations/post-punch-in';
+import { useForeground } from '@/utils/app-state';
+import { storage } from '@/utils/storage';
+import { SchemaGetPunchIn } from '@/validations/get-punch-in';
+import { SchemaPostPunchIn } from '@/validations/post-punch-in';
 import ConfigContext from './config';
 
 type AdpContextData = {

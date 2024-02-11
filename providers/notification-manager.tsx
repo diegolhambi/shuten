@@ -8,9 +8,9 @@ import React, {
     useState,
 } from 'react';
 
-import { PunchesMap } from '../app';
-import { Punch } from '../types/punch';
-import { Weekday } from '../utils/date';
+import { PunchesMap } from '@/(tabs)/punches-list';
+import { Punch } from '@/types/punch';
+import { Weekday } from '@/utils/date';
 import ConfigContext from './config';
 
 type NotificationManagerContextData = {

@@ -1,7 +1,7 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { Weekday } from '../utils/date';
-import { storage } from '../utils/storage';
+import { Weekday } from '@/utils/date';
+import { storage } from '@/utils/storage';
 
 export type HoursToWork = {
     punches: string[];

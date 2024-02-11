@@ -2,7 +2,7 @@ import { DateTime } from 'luxon';
 import { useEffect, useState } from 'react';
 import { H4, SizableText, styled, YStack } from 'tamagui';
 
-import { is24hourClock } from '../utils/date';
+import { is24hourClock } from '@/utils/date';
 
 const format: Intl.DateTimeFormatOptions = {
     hour12: !is24hourClock(),

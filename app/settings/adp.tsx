@@ -12,11 +12,11 @@ import {
     YStack,
 } from 'tamagui';
 
-import { AppSwitch } from '../../components/app-switch';
-import Item from '../../components/list-item';
-import AdpContext from '../../providers/adp';
-import ConfigContext from '../../providers/config';
-import { useDebounce } from '../../utils/limiter';
+import { AppSwitch } from '@/components/app-switch';
+import Item from '@/components/list-item';
+import AdpContext from '@/providers/adp';
+import ConfigContext from '@/providers/config';
+import { useDebounce } from '@/utils/limiter';
 
 export default function Adp() {
     const { config, setConfig } = useContext(ConfigContext);

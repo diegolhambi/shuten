@@ -2,8 +2,8 @@ import { DateTime } from 'luxon';
 import React, { useMemo } from 'react';
 import { Circle, H4, SizableText, styled, XStack, YStack } from 'tamagui';
 
-import { Punch, PunchType } from '../types/punch';
-import { hoursDiff, is24hourClock, ParseTime } from '../utils/date';
+import { Punch, PunchType } from '@/types/punch';
+import { hoursDiff, is24hourClock, ParseTime } from '@/utils/date';
 
 const is24hour = is24hourClock();
 

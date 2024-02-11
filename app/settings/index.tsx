@@ -2,7 +2,7 @@ import { ChevronRight } from '@tamagui/lucide-icons';
 import { router, Stack } from 'expo-router';
 import { XStackProps, YStack } from 'tamagui';
 
-import Item from '../../components/list-item';
+import Item from '@/components/list-item';
 
 function ConfigItem({
     title,

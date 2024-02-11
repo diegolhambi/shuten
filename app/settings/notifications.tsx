@@ -3,10 +3,10 @@ import { useCallback, useContext } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ScrollView, SizableText, styled, XStack } from 'tamagui';
 
-import { AppSwitch } from '../../components/app-switch';
-import Item from '../../components/list-item';
-import ConfigContext from '../../providers/config';
-import NotificationContext from '../../providers/notification-manager';
+import { AppSwitch } from '@/components/app-switch';
+import Item from '@/components/list-item';
+import ConfigContext from '@/providers/config';
+import NotificationContext from '@/providers/notification-manager';
 
 const Title = styled(SizableText, {
     name: 'Title',

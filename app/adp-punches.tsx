@@ -4,8 +4,8 @@ import { useContext, useState } from 'react';
 import { FlatList, SafeAreaView } from 'react-native';
 import { SizableText, YStack } from 'tamagui';
 
-import AdpContext from '../providers/adp';
-import { is24hourClock } from '../utils/date';
+import AdpContext from '@/providers/adp';
+import { is24hourClock } from '@/utils/date';
 
 export default function ScheduledNotifications() {
     const adp = useContext(AdpContext);
