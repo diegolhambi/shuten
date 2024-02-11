@@ -18,6 +18,7 @@
     "@react-native-community/datetimepicker": "7.6.1",
     "@react-native-cookies/cookies": "^6.2.1",
     "@react-navigation/native": "^6.0.2",
+    "@tamagui/animate-presence": "1.89.0",
     "@tamagui/babel-plugin": "^1.89.7",
     "@tamagui/config": "^1.89.0",
     "@tamagui/lucide-icons": "^1.89.0",

@@ -5,45 +5,31 @@ import {
 } from '@tamagui/lucide-icons';
 import { useToastController } from '@tamagui/toast';
 import * as NavigationBar from 'expo-navigation-bar';
-import { SplashScreen, router, useFocusEffect } from 'expo-router';
+import { SplashScreen, Stack, router, useFocusEffect } from 'expo-router';
 import * as SystemUI from 'expo-system-ui';
 import { DateTime } from 'luxon';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { FlatList, Platform, Vibration } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Input, XStack, styled, useTheme } from 'tamagui';
+import { Button, Input, View, XStack, styled, useTheme } from 'tamagui';
 
-import { BottomBar } from '../components/bottom-bar';
-import Clock from '../components/clock';
-import Menu from '../components/menu';
-import { PunchButton } from '../components/punch-button';
-import PunchItem from '../components/punch-item';
-import AdpContext from '../providers/adp';
-import ConfigContext from '../providers/config';
-import DatabaseContext from '../providers/database';
-import NotificationContext from '../providers/notification-manager';
-import { Punch, PunchType } from '../types/punch';
-import { Weekday } from '../utils/date';
-import { days, getDayPunches, indexToday } from '../utils/punch-list';
+import { BottomBar } from '@/components/bottom-bar';
+import Menu from '@/components/menu';
+import { PunchButton } from '@/components/punch-button';
+import PunchItem from '@/components/punch-item';
+import AdpContext from '@/providers/adp';
+import ConfigContext from '@/providers/config';
+import DatabaseContext from '@/providers/database';
+import NotificationContext from '@/providers/notification-manager';
+import { Punch, PunchType } from '@/types/punch';
+import { Weekday } from '@/utils/date';
+import { days, getDayPunches, indexToday } from '@/utils/punch-list';
+import { AreaView } from '@/components/area-view';
 
 const PUNCHES = new Map<string, Punch[]>();
 export type PunchesMap = typeof PUNCHES;
 
-const AreaView = styled(SafeAreaView, {
-    name: 'HomeAreaView',
-    flex: 1,
-    edges: ['top', 'right', 'left'],
-    backgroundColor: '$backgroundStrong',
-});
-
-const BottomAreaView = styled(SafeAreaView, {
-    name: 'HomeBottomAreaView',
-    edges: ['bottom'],
-    backgroundColor: '$backgroundHover',
-});
-
-export default function Home() {
-    const theme = useTheme();
+export default function PunchesList() {
     const { config } = useContext(ConfigContext);
     const { db } = useContext(DatabaseContext);
     const adp = useContext(AdpContext);
@@ -102,18 +88,6 @@ export default function Home() {
                 notification.scheduleFirstPunch(PUNCHES);
             });
         }, [fetchedPunches])
-    );
-
-    useFocusEffect(
-        useCallback(() => {
-            SystemUI.setBackgroundColorAsync(theme.background.val);
-
-            if (Platform.OS !== 'android') {
-                return;
-            }
-
-            NavigationBar.setBackgroundColorAsync(theme.backgroundHover.val);
-        }, [])
     );
 
     useEffect(() => {
@@ -181,10 +155,10 @@ export default function Home() {
             type: PunchType;
         }> = await db.getAllAsync(
             `select 
-                    DATE(date) as date,
-                    strftime('%H:%M', date) as time,
-                    type
-                from punches`
+                  DATE(date) as date,
+                  strftime('%H:%M', date) as time,
+                  type
+              from punches`
         );
 
         for (const item of result) {
@@ -228,7 +202,22 @@ export default function Home() {
     }
 
     return (
-        <AreaView onLayout={() => SplashScreen.hideAsync()}>
+        <View flex={1} bg="$backgroundStrong">
+            <Stack.Screen
+                options={{
+                    headerShown: true,
+                    title: 'Punches',
+                    headerRight: () => (
+                        <Button
+                            onPress={() => setOpenMenu(true)}
+                            chromeless
+                            px="$3"
+                            icon={<MoreVertical size="$1.5" />}
+                        />
+                    ),
+                }}
+            />
+ 
             <FlatList
                 data={data}
                 initialNumToRender={15}
@@ -270,9 +259,7 @@ export default function Home() {
                             onChangeText={(text) => setDevDate(text)}
                         />
                     </XStack>
-                ) : (
-                    <Clock />
-                )}
+                ) : null}
                 <PunchButton
                     onPressIn={() => {
                         if (Platform.OS === 'android') {
@@ -296,7 +283,6 @@ export default function Home() {
                     backgroundColor={bgButtonPunch}
                 />
             </BottomBar>
-            <BottomAreaView />
             <Menu open={openMenu} onOpenChange={setOpenMenu}>
                 <Menu.Item
                     onPress={() => {
@@ -347,6 +333,6 @@ export default function Home() {
                     Settings
                 </Menu.Item>
             </Menu>
-        </AreaView>
+        </View>
     );
 }

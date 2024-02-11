@@ -1,6 +1,6 @@
 import { DateTime } from 'luxon';
-import { useEffect, useState } from 'react';
-import { H4, SizableText, styled, YStack } from 'tamagui';
+import { useEffect, useMemo, useState } from 'react';
+import { SizableText, styled } from 'tamagui';
 
 import { is24hourClock } from '@/utils/date';
 
@@ -20,23 +20,9 @@ function dateTextNow() {
     });
 }
 
-const Wrapper = styled(YStack, {
-    name: 'DateTimeWrapper',
-    flexGrow: 0,
-    alignItems: 'flex-end',
-});
-
 export default function Clock() {
     const [time, setTime] = useState(DateTime.now().toLocaleString(format));
-    const [today, setToday] = useState(dateTextNow());
-
-    useEffect(() => {
-        const timer = setInterval(() => {
-            setToday(dateTextNow());
-        }, 21600000);
-
-        return () => clearInterval(timer);
-    }, []);
+    const today = useMemo(() => dateTextNow(), [DateTime.now().toISODate()]);
 
     useEffect(() => {
         const interval = setInterval(() => {
@@ -46,10 +32,16 @@ export default function Clock() {
         return () => clearInterval(interval);
     }, []);
 
-    return (
-        <Wrapper>
-            <H4>{time}</H4>
-            <SizableText size="$4">{today}</SizableText>
-        </Wrapper>
-    );
+    return <ClockText>{time}</ClockText>;
 }
+
+
+const ClockText = styled(SizableText, {
+    name: 'Clock',
+    pl: '$4',
+    pr: '$3',
+    size: '$8',
+    fontFamily: '$tabular',
+});
+
+

@@ -26,7 +26,7 @@ export {
 
 export const unstable_settings = {
     // Ensure that reloading on `/modal` keeps a back button present.
-    initialRouteName: 'index',
+    initialRouteName: '(tabs)',
 };
 
 // Keep the splash screen visible while we fetch resources
@@ -68,7 +68,12 @@ function RootLayoutNav() {
                                 <AdpProvider>
                                     <Stack
                                         screenOptions={{ headerShown: false }}
-                                    />
+                                    >
+                                        <Stack.Screen
+                                            name="(tabs)"
+                                            options={{ headerShown: false, title: '' }}
+                                        />
+                                    </Stack>
                                 </AdpProvider>
                             </NotificationProvider>
                         </DatabaseProvider>
