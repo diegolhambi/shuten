@@ -1,21 +1,11 @@
-import {
-    Clock as ClockIcon,
-    MailCheck,
-    MoreVertical,
-} from '@tamagui/lucide-icons';
+import { MoreVertical } from '@tamagui/lucide-icons';
 import { useToastController } from '@tamagui/toast';
-import * as NavigationBar from 'expo-navigation-bar';
-import { SplashScreen, Stack, router, useFocusEffect } from 'expo-router';
-import * as SystemUI from 'expo-system-ui';
+import { Stack, router, useFocusEffect } from 'expo-router';
 import { DateTime } from 'luxon';
 import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { FlatList, Platform, Vibration } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { Button, Input, View, XStack, styled, useTheme } from 'tamagui';
-
-import { BottomBar } from '@/components/bottom-bar';
+import { FlatList } from 'react-native';
+import { Button, View } from 'tamagui';
 import Menu from '@/components/menu';
-import { PunchButton } from '@/components/punch-button';
 import PunchItem from '@/components/punch-item';
 import AdpContext from '@/providers/adp';
 import ConfigContext from '@/providers/config';
@@ -23,8 +13,12 @@ import DatabaseContext from '@/providers/database';
 import NotificationContext from '@/providers/notification-manager';
 import { Punch, PunchType } from '@/types/punch';
 import { Weekday } from '@/utils/date';
-import { days, getDayPunches, indexToday } from '@/utils/punch-list';
-import { AreaView } from '@/components/area-view';
+import {
+    days,
+    getDayPunches,
+    indexToday,
+    monthDaysRange,
+} from '@/utils/punch-list';
 
 const PUNCHES = new Map<string, Punch[]>();
 export type PunchesMap = typeof PUNCHES;
@@ -53,7 +47,14 @@ export default function PunchesList() {
         const index = indexToday(config.firstDayOfMonth) - 3;
 
         return index < 0 ? 0 : index;
-    }, [JSON.stringify(config)]);
+    }, [JSON.stringify(config), DateTime.now().toISODate()]);
+
+    const dates = useMemo(
+        () => monthDaysRange(config.firstDayOfMonth),
+        [DateTime.now().toISODate()]
+    );
+
+    console.log(dates);
 
     useEffect(() => {
         const timer = setInterval(() => {
@@ -120,8 +121,8 @@ export default function PunchesList() {
 
     function getItemLayout(_: any, index: number) {
         return {
-            length: 87,
-            offset: 87 * index,
+            length: 88,
+            offset: 88 * index,
             index,
         };
     }
@@ -206,7 +207,9 @@ export default function PunchesList() {
             <Stack.Screen
                 options={{
                     headerShown: true,
-                    title: 'Punches',
+                    headerTitle: `${dates[0].toLocaleString({
+                        month: 'short',
+                    })} - ${dates[1].toLocaleString({ month: 'short' })}`,
                     headerRight: () => (
                         <Button
                             onPress={() => setOpenMenu(true)}
@@ -217,7 +220,7 @@ export default function PunchesList() {
                     ),
                 }}
             />
- 
+
             <FlatList
                 data={data}
                 initialNumToRender={15}
@@ -226,24 +229,10 @@ export default function PunchesList() {
                 keyExtractor={keyExtractor}
                 getItemLayout={getItemLayout}
             />
-            <BottomBar>
-                <XStack flexGrow={1}>
-                    <Button
-                        onPress={() => setOpenMenu(true)}
-                        chromeless
-                        px="$3"
-                        icon={<MoreVertical size="$1.5" />}
-                    />
-                </XStack>
+            {/* <BottomBar>
+                <XStack flexGrow={1} />
                 {devMode ? (
                     <XStack gap="$1" alignItems="center" flexShrink={1}>
-                        <Button
-                            size="$2"
-                            icon={<MailCheck />}
-                            onPress={() => {
-                                //toast.show('Not implemented yet');
-                            }}
-                        />
                         <Button
                             size="$2"
                             icon={<ClockIcon />}
@@ -282,11 +271,15 @@ export default function PunchesList() {
                     }}
                     backgroundColor={bgButtonPunch}
                 />
-            </BottomBar>
+            </BottomBar> */}
             <Menu open={openMenu} onOpenChange={setOpenMenu}>
                 <Menu.Item
                     onPress={() => {
                         toast.show('To do');
+                        insertPunch('2024-02-09 07:45');
+                        insertPunch('2024-02-09 12:00');
+                        insertPunch('2024-02-09 13:10');
+                        insertPunch('2024-02-09 16:45');
                     }}
                 >
                     Add punch

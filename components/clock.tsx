@@ -35,7 +35,6 @@ export default function Clock() {
     return <ClockText>{time}</ClockText>;
 }
 
-
 const ClockText = styled(SizableText, {
     name: 'Clock',
     pl: '$4',
@@ -43,5 +42,3 @@ const ClockText = styled(SizableText, {
     size: '$8',
     fontFamily: '$tabular',
 });
-
-

@@ -1,6 +1,6 @@
-import { DateTime } from "luxon";
-import React, { useMemo } from "react";
-import { SizableText } from "tamagui";
+import { DateTime } from 'luxon';
+import React, { useMemo } from 'react';
+import { SizableText } from 'tamagui';
 
 export function DateHeader() {
     const date = useMemo(() => dateText(), [DateTime.now().toISODate()]);
@@ -11,7 +11,7 @@ export function DateHeader() {
             <SizableText size="$10">{date}</SizableText>
             <SizableText size="$9">{week}</SizableText>
         </>
-    )
+    );
 }
 
 function dateText() {
@@ -28,4 +28,3 @@ function weekText() {
         weekday: 'long',
     });
 }
-
