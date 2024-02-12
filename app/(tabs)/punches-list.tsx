@@ -121,8 +121,8 @@ export default function PunchesList() {
 
     function getItemLayout(_: any, index: number) {
         return {
-            length: 88,
-            offset: 88 * index,
+            length: 71,
+            offset: 71 * index,
             index,
         };
     }
