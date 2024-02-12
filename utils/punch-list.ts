@@ -14,10 +14,10 @@ export function monthDaysRange(
 
     if (today.day >= firstDay) {
         initalDate = today.set({ day: firstDay });
-        finalDate = initalDate.plus({ days: 31 });
+        finalDate = initalDate.plus({ days: 30 });
     } else {
         initalDate = today.minus({ month: 1 }).set({ day: firstDay });
-        finalDate = initalDate.plus({ days: 31 });
+        finalDate = initalDate.plus({ days: 30 });
     }
 
     return [initalDate, finalDate];
@@ -30,7 +30,7 @@ export function days(firstDay: number): string[] {
 
     const days: string[] = [];
 
-    for (let i = 0; i < diff; i++) {
+    for (let i = 0; i <= diff; i++) {
         const date = initalDate.plus({ days: i });
 
         days.push(date.toISODate() as string);
