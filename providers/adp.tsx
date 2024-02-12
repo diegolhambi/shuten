@@ -5,7 +5,6 @@ import { DateTime } from 'luxon';
 import qs from 'qs';
 import React, {
     createContext,
-    useContext,
     useEffect,
     useMemo,
     useRef,
@@ -17,7 +16,7 @@ import { useForeground } from '@/utils/app-state';
 import { storage } from '@/utils/storage';
 import { SchemaGetPunchIn } from '@/validations/get-punch-in';
 import { SchemaPostPunchIn } from '@/validations/post-punch-in';
-import ConfigContext from './config';
+import { useConfig } from './config';
 
 type AdpContextData = {
     login(user: string, password: string): Promise<LoginResult>;
@@ -186,7 +185,7 @@ async function login(user: string, password: string): Promise<LoginResult> {
 }
 
 export function AdpProvider({ children }: Props) {
-    const { config } = useContext(ConfigContext);
+    const { config } = useConfig();
     const toast = useToastController();
 
     const [logged, setLogged] = useState(false);

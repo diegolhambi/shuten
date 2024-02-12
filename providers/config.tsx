@@ -119,4 +119,6 @@ export function ConfigProvider({ children }: ConfigProviderProps) {
     );
 }
 
-export default ConfigContext;
+export function useConfig() {
+    return React.useContext(ConfigContext);
+}

@@ -1,14 +1,7 @@
-import { MoreVertical } from '@tamagui/lucide-icons';
-import { useToastController } from '@tamagui/toast';
-import { Stack, router, useFocusEffect } from 'expo-router';
-import { DateTime } from 'luxon';
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { FlatList } from 'react-native';
-import { Button, View } from 'tamagui';
 import Menu from '@/components/menu';
 import PunchItem from '@/components/punch-item';
 import AdpContext from '@/providers/adp';
-import ConfigContext from '@/providers/config';
+import { useConfig } from '@/providers/config';
 import DatabaseContext from '@/providers/database';
 import NotificationContext from '@/providers/notification-manager';
 import { Punch, PunchType } from '@/types/punch';
@@ -19,12 +12,19 @@ import {
     indexToday,
     monthDaysRange,
 } from '@/utils/punch-list';
+import { MoreVertical } from '@tamagui/lucide-icons';
+import { useToastController } from '@tamagui/toast';
+import { Stack, router, useFocusEffect } from 'expo-router';
+import { DateTime } from 'luxon';
+import { useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { FlatList } from 'react-native';
+import { Button, View } from 'tamagui';
 
 const PUNCHES = new Map<string, Punch[]>();
 export type PunchesMap = typeof PUNCHES;
 
 export default function PunchesList() {
-    const { config } = useContext(ConfigContext);
+    const { config } = useConfig();
     const { db } = useContext(DatabaseContext);
     const adp = useContext(AdpContext);
     const notification = useContext(NotificationContext);

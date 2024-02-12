@@ -1,17 +1,11 @@
 import * as Notifications from 'expo-notifications';
-import { DateTime, Duration } from 'luxon';
-import React, {
-    createContext,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import { DateTime } from 'luxon';
+import React, { createContext, useEffect, useMemo, useState } from 'react';
 
 import { PunchesMap } from '@/app/(tabs)/punches-list';
 import { Punch } from '@/types/punch';
 import { Weekday } from '@/utils/date';
-import ConfigContext from './config';
+import { useConfig } from './config';
 
 type NotificationManagerContextData = {
     granted: boolean | undefined;
@@ -89,7 +83,7 @@ const textEarlyNotifications = {
 };
 
 export function NotificationProvider({ children }: Props) {
-    const { config } = useContext(ConfigContext);
+    const { config } = useConfig();
     const [granted, setGranted] = useState<boolean | undefined>();
 
     useEffect(() => {
