@@ -1,10 +1,30 @@
+import { useForeground } from '@/utils/app-state';
 import { DateTime } from 'luxon';
-import React, { useMemo } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { SizableText } from 'tamagui';
 
 export function DateHeader() {
-    const date = useMemo(() => dateText(), [DateTime.now().toISODate()]);
-    const week = useMemo(() => weekText(), [DateTime.now().toISODate()]);
+    const [date, setDate] = useState(dateText());
+    const [week, setWeek] = useState(weekText());
+
+    const updateText = useCallback(() => {
+        setDate(dateText());
+        setWeek(weekText());
+    }, []);
+
+    useForeground(updateText);
+
+    useEffect(() => {
+        const now = DateTime.now();
+        const startOfNextDay = now.plus({ days: 1 }).startOf('day');
+
+        const timer = setTimeout(
+            updateText,
+            startOfNextDay.diff(now).toMillis()
+        );
+
+        return () => clearTimeout(timer);
+    }, [date, week]);
 
     return (
         <>
