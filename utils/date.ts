@@ -1,5 +1,6 @@
-import { getCalendars } from 'expo-localization';
+import { getCalendars, getLocales } from 'expo-localization';
 import { DateTime } from 'luxon';
+import { Platform } from 'react-native';
 
 export type Weekday = 1 | 2 | 3 | 4 | 5 | 6 | 7;
 
@@ -41,4 +42,22 @@ export function getWeekdays(format: 'long' | 'short' | 'narrow' = 'narrow') {
     }
 
     return weekdays;
+}
+
+export function fTime(time: DateTime): string {
+    return time.toLocaleString({
+        hour12: !is24hourClock(),
+        hour: '2-digit',
+        minute: '2-digit',
+    });
+}
+
+export function fDateShort(date: DateTime): string {
+    const locales = getLocales();
+    const languageTag =
+        Platform.OS === 'android'
+            ? locales[locales.length - 1].languageTag
+            : locales[0].languageTag;
+
+    return date.setLocale(languageTag).toLocaleString(DateTime.DATE_SHORT);
 }
