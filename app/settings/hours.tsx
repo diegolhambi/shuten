@@ -17,10 +17,7 @@ import {
 } from 'tamagui';
 
 import { AppSwitch } from '@/components/app-switch';
-import ConfigContext, {
-    defaultHourToWork,
-    HoursToWork,
-} from '@/providers/config';
+import { defaultHourToWork, HoursToWork, useConfig } from '@/providers/config';
 import { getWeekdays, is24hourClock, ParseTime, Weekday } from '@/utils/date';
 
 const textWeekdays = {
@@ -141,7 +138,7 @@ function HoursWorked(props: HoursWorkedProps) {
 }
 
 function ConfigHours() {
-    const { config, setConfig } = useContext(ConfigContext);
+    const { config, setConfig } = useConfig();
 
     const [initialValue, setInitialValue] =
         useState<HoursToWork>(defaultHourToWork);
