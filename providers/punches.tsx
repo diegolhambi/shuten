@@ -4,10 +4,10 @@ import { DateTime } from 'luxon';
 import { create } from 'zustand';
 
 export const usePunchStore = create<PunchStore>((set, get) => ({
-    state: 'unloaded',
+    state: 'Unloaded',
     punches: {} as Punches,
     load: async (dates) => {
-        set({ state: 'loading' });
+        set({ state: 'Loading' });
 
         const newPunches: Punches = {};
 
@@ -18,7 +18,7 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
                   type
               FROM punches
               WHERE date >= ? AND date <= ?`,
-            [dates[0].toISODate(), dates[1].toISODate()]
+            [dates[0].toISO(), dates[1].toISO()]
         );
 
         for (const item of result) {
@@ -32,7 +32,7 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
             }
         }
 
-        set({ state: 'loaded', punches: newPunches });
+        set({ state: 'Loaded', punches: newPunches });
     },
     insert: async (dateTime = DateTime.now(), type: PunchType = 'punch') => {
         try {
@@ -71,6 +71,33 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
             throw error;
         }
     },
+    remove: async (dateTime) => {
+        try {
+            await db.runAsync(`DELETE FROM punches WHERE date = ?;`, [
+                dateTime.toFormat('yyyy-LL-dd HH:mm'),
+            ]);
+
+            const date = dateTime.toISODate() as string;
+            const time = dateTime.toFormat('HH:mm') as string;
+
+            const newPunches = { ...get().punches };
+
+            if (newPunches[date]) {
+                newPunches[date] = newPunches[date].filter(
+                    (punch) => punch.time !== time
+                );
+            }
+
+            set((state) => ({
+                ...state,
+                punches: newPunches,
+            }));
+
+            return 'Deleted';
+        } catch (error) {
+            throw error;
+        }
+    },
     nuke: async () => {
         await db.runAsync(`DELETE FROM punches;`);
         set((state) => ({
@@ -82,15 +109,19 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
 
 type DateRange = [initalDate: DateTime, finalDate: DateTime];
 export type Punches = Record<string, Punch[]>;
+type PunchStoreState = 'Unloaded' | 'Loading' | 'Loaded';
 type DatabaseOperation = 'Inserted' | 'Updated' | 'Duplicate' | 'Deleted';
 
 type PunchStore = {
-    state: 'unloaded' | 'loading' | 'loaded';
+    state: PunchStoreState;
     punches: Punches;
     load(dates: DateRange): Promise<void>;
     insert(
         dateTime?: DateTime
     ): Promise<Exclude<DatabaseOperation, 'Updated' | 'Deleted'>>;
+    remove(
+        dateTime: DateTime
+    ): Promise<Exclude<DatabaseOperation, 'Updated' | 'Inserted'>>;
     nuke(): Promise<void>;
 };
 
