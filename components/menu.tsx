@@ -1,12 +1,12 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
-    H5,
     Sheet,
     SheetProps,
+    SizableText,
     TextProps,
-    withStaticProperties,
     XStack,
     XStackProps,
+    withStaticProperties,
 } from 'tamagui';
 
 type ItemProps = XStackProps & {
@@ -23,7 +23,9 @@ function Item(props: ItemProps) {
             py="$4"
             {...rest}
         >
-            <H5 userSelect="none">{children}</H5>
+            <SizableText userSelect="none" size="$6">
+                {children}
+            </SizableText>
         </XStack>
     );
 }
