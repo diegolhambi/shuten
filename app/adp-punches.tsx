@@ -1,20 +1,24 @@
 import { Stack, useFocusEffect } from 'expo-router';
 import { DateTime } from 'luxon';
-import { useContext, useState } from 'react';
+import { useState } from 'react';
 import { FlatList, SafeAreaView } from 'react-native';
 import { SizableText, YStack } from 'tamagui';
 
-import AdpContext from '@/providers/adp';
+import { useAdp } from '@/providers/adp';
 import { is24hourClock } from '@/utils/date';
 
 export default function ScheduledNotifications() {
-    const adp = useContext(AdpContext);
+    const adp = useAdp();
 
     const [punches, setPunches] = useState<DateTime[]>([]);
 
     useFocusEffect(() => {
         adp.punches().then((result) => {
             if (result) {
+                if (!Array.isArray(result)) {
+                    return;
+                }
+
                 setPunches(result);
             }
         });
