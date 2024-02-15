@@ -5,11 +5,11 @@ import { create } from 'zustand';
 
 export const usePunchStore = create<PunchStore>((set, get) => ({
     state: 'unloaded',
-    punches: new Map<string, Punch[]>(),
+    punches: {} as Punches,
     load: async (dates) => {
         set({ state: 'loading' });
 
-        const newPunches: PunchesMap = new Map();
+        const newPunches: Punches = {};
 
         const result: ResultPunches[] = await db.getAllAsync(
             `SELECT 
@@ -22,23 +22,43 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
         );
 
         for (const item of result) {
-            if (newPunches.has(item.date)) {
-                const old = newPunches.get(item.date) || [];
-                old.push({ time: item.time, type: item.type });
-                newPunches.set(item.date, old);
-                continue;
+            if (newPunches[item.date]) {
+                newPunches[item.date].push({
+                    time: item.time,
+                    type: item.type,
+                });
+            } else {
+                newPunches[item.date] = [{ time: item.time, type: item.type }];
             }
-
-            newPunches.set(item.date, [{ time: item.time, type: item.type }]);
         }
 
         set({ state: 'loaded', punches: newPunches });
     },
-    insert: async (dateTime = DateTime.now()) => {
+    insert: async (dateTime = DateTime.now(), type: PunchType = 'punch') => {
         try {
-            await db.runAsync(`INSERT INTO punches VALUES (?, 'punch');`, [
+            await db.runAsync(`INSERT INTO punches VALUES (?, ?);`, [
                 dateTime.toFormat('yyyy-LL-dd HH:mm'),
+                type,
             ]);
+
+            const newPunches = { ...get().punches };
+
+            const date = dateTime.toISODate() as string;
+            const time = dateTime.toFormat('HH:mm') as string;
+
+            if (newPunches[date]) {
+                newPunches[date].push({
+                    time: time,
+                    type: type,
+                });
+            } else {
+                newPunches[date] = [{ time: time, type: type }];
+            }
+
+            set((state) => ({
+                ...state,
+                punches: newPunches,
+            }));
 
             return 'Inserted';
         } catch (error: any) {
@@ -54,12 +74,12 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
 }));
 
 type DateRange = [initalDate: DateTime, finalDate: DateTime];
-type PunchesMap = Map<string, Punch[]>;
+export type Punches = Record<string, Punch[]>;
 type DatabaseOperation = 'Inserted' | 'Updated' | 'Duplicate' | 'Deleted';
 
 type PunchStore = {
     state: 'unloaded' | 'loading' | 'loaded';
-    punches: Map<string, Punch[]>;
+    punches: Punches;
     load(dates: DateRange): Promise<void>;
     insert(
         dateTime?: DateTime

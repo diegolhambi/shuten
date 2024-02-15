@@ -3,6 +3,7 @@ import { DateTime, Duration } from 'luxon';
 import { Config } from '@/providers/config';
 import { Punch } from '@/types/punch';
 import { Weekday } from './date';
+import { Punches } from '@/providers/punches';
 
 export function monthDaysRange(
     firstDay: number
@@ -45,11 +46,11 @@ export function indexToday(firstDay: number): number {
     return DateTime.now().diff(initialDate, 'days').days;
 }
 
-export function getDayPunches(punches: Map<string, Punch[]>, config: Config) {
+export function getDayPunches(punches: Punches, config: Config) {
     const today = DateTime.now();
 
     return (day: string): Punch[] => {
-        const listPunches = punches.get(day) || [];
+        const listPunches = punches[day] || [];
 
         const date = DateTime.fromISO(day);
 
