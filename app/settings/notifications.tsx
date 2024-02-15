@@ -1,12 +1,12 @@
 import { Stack } from 'expo-router';
-import { useCallback, useContext } from 'react';
+import { useCallback } from 'react';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { ScrollView, SizableText, styled, XStack } from 'tamagui';
+import { ScrollView, SizableText, XStack, styled } from 'tamagui';
 
 import { AppSwitch } from '@/components/app-switch';
 import Item from '@/components/list-item';
-import ConfigContext from '@/providers/config';
-import NotificationContext from '@/providers/notification-manager';
+import { useConfig } from '@/providers/config';
+import { useNotification } from '@/providers/notification-manager';
 
 const Title = styled(SizableText, {
     name: 'Title',
@@ -42,13 +42,12 @@ function ToggleItem(props: {
 }
 
 export default function Notifications() {
-    const { config, setConfig } = useContext(ConfigContext);
-    const { requestPermission } = useContext(NotificationContext);
+    const { config, setConfig } = useConfig();
+    const { requestPermission } = useNotification();
     const { bottom } = useSafeAreaInsets();
 
     const handleChange = useCallback(
         (punch: 0 | 1 | 2 | 3, when: 'onTime' | 'early', value: boolean) => {
-            console.log(punch, when, value);
             setConfig({
                 ...config,
                 notification: {

@@ -1,7 +1,7 @@
 import { useToastController } from '@tamagui/toast';
 import { Stack } from 'expo-router';
 import { DateTime } from 'luxon';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
     Button,
     Input,
@@ -14,13 +14,13 @@ import {
 
 import { AppSwitch } from '@/components/app-switch';
 import Item from '@/components/list-item';
-import AdpContext from '@/providers/adp';
-import ConfigContext from '@/providers/config';
+import { useAdp } from '@/providers/adp';
+import { useConfig } from '@/providers/config';
 import { useDebounce } from '@/utils/limiter';
 
 export default function Adp() {
-    const { config, setConfig } = useContext(ConfigContext);
-    const { login } = useContext(AdpContext);
+    const { config, setConfig } = useConfig();
+    const { login } = useAdp();
     const toast = useToastController();
 
     const [showPassword, setShowPassword] = useState(true);
