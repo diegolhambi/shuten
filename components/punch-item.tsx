@@ -18,7 +18,7 @@ const punchLabel: { [K in Exclude<PunchType, 'punch'>]: string } = {
 
 export type PunchItemProps = {
     day: string;
-    today: string;
+    today: DateTime;
     fetchedPunches: number;
     getPunches: (day: string) => Punch[];
 };
@@ -37,7 +37,7 @@ export default function PunchItem(props: PunchItemProps) {
 
     const punches = useMemo(() => getPunches(day), [day, fetchedPunches]);
 
-    const isToday = useMemo(() => day === today, [day, today]);
+    const isToday = useMemo(() => day === today.toISODate(), [day, today]);
 
     return (
         <PunchItemFrame>
