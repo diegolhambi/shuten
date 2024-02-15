@@ -2,15 +2,15 @@ import * as Notifications from 'expo-notifications';
 import { DateTime } from 'luxon';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { PunchesMap } from '@/app/(tabs)/punches-list';
 import { Punch } from '@/types/punch';
 import { Weekday } from '@/utils/date';
 import { useConfig } from './config';
+import { Punches } from '@/providers/punches';
 
 type NotificationManagerContextData = {
     granted: boolean | undefined;
     requestPermission: () => Promise<boolean>;
-    scheduleFirstPunch: (punches: PunchesMap) => Promise<void>;
+    scheduleFirstPunch: (punches: Punches) => Promise<void>;
     scheduleNext: (time: string, punch: Punch[]) => void;
 };
 
@@ -154,7 +154,7 @@ export function NotificationProvider({ children }: Props) {
         }
     }
 
-    async function scheduleFirstPunch(punches: PunchesMap) {
+    async function scheduleFirstPunch(punches: Punches) {
         if (!granted) {
             return;
         }
@@ -183,7 +183,7 @@ export function NotificationProvider({ children }: Props) {
                 continue;
             }
 
-            if (punches.get(iterator.toFormat('yyyy-MM-dd'))?.length) {
+            if (punches[iterator.toFormat('yyyy-MM-dd')]?.length) {
                 iterator = iterator.plus({ days: 1 });
                 continue;
             }
@@ -278,4 +278,6 @@ export function NotificationProvider({ children }: Props) {
     );
 }
 
-export default NotificationContext;
+export function useNotification() {
+    return React.useContext(NotificationContext);
+}
