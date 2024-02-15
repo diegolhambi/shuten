@@ -411,4 +411,6 @@ export function AdpProvider({ children }: Props) {
     );
 }
 
-export default AdpContext;
+export function useAdp() {
+    return React.useContext(AdpContext);
+}
