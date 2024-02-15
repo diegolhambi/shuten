@@ -21,7 +21,15 @@ export function monthDaysRange(
         finalDate = initalDate.plus({ days: 30 });
     }
 
-    return [initalDate, finalDate];
+    return [
+        initalDate.set({ hour: 0, minute: 0, second: 0, millisecond: 0 }),
+        finalDate.set({
+            hour: 23,
+            minute: 59,
+            second: 59,
+            millisecond: 999,
+        }),
+    ];
 }
 
 export function days(firstDay: number): string[] {
