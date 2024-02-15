@@ -11,7 +11,7 @@ type NotificationManagerContextData = {
     granted: boolean | undefined;
     requestPermission: () => Promise<boolean>;
     scheduleFirstPunch: (punches: Punches) => Promise<void>;
-    scheduleNext: (time: string, punch: Punch[]) => void;
+    scheduleNext: (dateTime: DateTime, punch: Punch[]) => void;
 };
 
 const NotificationContext = createContext<NotificationManagerContextData>(
@@ -206,7 +206,7 @@ export function NotificationProvider({ children }: Props) {
         }
     }
 
-    function scheduleNext(dateTime: string, punches: Punch[]) {
+    function scheduleNext(dateTime: DateTime, punches: Punch[]) {
         if (!granted) {
             return;
         }
@@ -234,10 +234,7 @@ export function NotificationProvider({ children }: Props) {
             string,
         ];
 
-        const notifyTrigger = DateTime.fromFormat(
-            dateTime,
-            'yyyy-LL-dd HH:mm'
-        ).set({
+        const notifyTrigger = dateTime.set({
             hour: +hour,
             minute: +minute,
             second: 0,
@@ -246,7 +243,7 @@ export function NotificationProvider({ children }: Props) {
 
         Notifications.getAllScheduledNotificationsAsync().then(
             (notifications) => {
-                const identifier = dateTime.split(' ')[0]!;
+                const identifier = dateTime.toFormat('yyyy-MM-dd');
 
                 notifications.forEach((notification) => {
                     if (notification.identifier.includes(identifier)) {
