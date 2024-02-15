@@ -5,6 +5,7 @@ import { DateTime } from 'luxon';
 import qs from 'qs';
 import React, {
     createContext,
+    useCallback,
     useEffect,
     useMemo,
     useRef,
@@ -18,17 +19,220 @@ import { SchemaGetPunchIn } from '@/validations/get-punch-in';
 import { SchemaPostPunchIn } from '@/validations/post-punch-in';
 import { useConfig } from './config';
 
+const AdpContext = createContext<AdpContextData>({
+    state: 'Unknown',
+} as AdpContextData);
+
+export function useAdp() {
+    return React.useContext(AdpContext);
+}
+
+export function AdpProvider({ children }: { children?: React.ReactNode }) {
+    const { config } = useConfig();
+
+    const [state, setState] = useState<AdpState>('Unknown');
+
+    const initialized = useRef(false);
+
+    const callRevalidateClient = useCallback(() => {
+        revalidateClient();
+    }, [JSON.stringify(config)]);
+
+    useForeground(callRevalidateClient);
+
+    useEffect(() => {
+        const interval = setInterval(callRevalidateClient, 3600000);
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, [config]);
+
+    useEffect(() => {
+        if (initialized.current) {
+            return;
+        }
+
+        initialized.current = true;
+        revalidateClient();
+    }, [config]);
+
+    async function revalidateClient() {
+        if (config.adp.activated === false) {
+            setState('NotConfigured');
+            return;
+        }
+
+        if (config.adp.user === '' || config.adp.password === '') {
+            setState('NotConfigured');
+            return;
+        }
+
+        setState('Logging');
+
+        const sessionId = storage.getString('adp_newexpert_sessionid');
+
+        if (!sessionId) {
+            doLogin();
+            return;
+        }
+
+        const expires = storage.getNumber('adp_session_expires') || 0;
+
+        if (DateTime.now().toUnixInteger() > expires) {
+            doLogin();
+            return;
+        }
+
+        if (Platform.OS === 'ios') {
+            const cookiesString = storage.getString('adp_cookies');
+            const cookies: { [key: string]: Cookie } = cookiesString
+                ? JSON.parse(cookiesString)
+                : {};
+
+            for (const [, cookie] of Object.entries(cookies)) {
+                CookieManager.set(client.defaults.baseURL!, cookie);
+            }
+        }
+
+        client.defaults.headers.common = {
+            ...loggedHeaders(sessionId),
+        };
+
+        client.defaults.params = {
+            lp: 'true',
+        };
+
+        const result = await client.get('punch/punchin/user-info');
+
+        if (isLoggedOut(result.headers)) {
+            await doLogin();
+            return;
+        }
+
+        setState('Logged');
+    }
+
+    async function doLogin() {
+        setState('Logging');
+
+        try {
+            const result = await login(config.adp.user, config.adp.password);
+
+            if (result === 'Success') {
+                setState('Logged');
+            }
+
+            if (result !== 'Success') {
+                setState('NotLogged');
+            }
+
+            return result;
+        } catch (error) {
+            return 'Error';
+        }
+    }
+
+    async function punch(isRetry = false) {
+        if (!config.adp.activated) {
+            return 'NotConfigured';
+        }
+
+        if (!client) {
+            return 'NotInitialized';
+        }
+
+        try {
+            const result = await client.post('punch/punchin', {
+                punchType: 'SPMobile',
+                punchLatitude: null,
+                punchLongitude: null,
+                punchAction: null,
+            });
+
+            if (isLoggedOut(result.headers)) {
+                return 'NotLogged';
+            }
+
+            if (result.status !== 200) {
+                return 'NotLogged';
+            }
+
+            SchemaPostPunchIn.parse(result.data);
+
+            return 'Success';
+        } catch (error) {
+            if (!isRetry) {
+                const result = await doLogin();
+
+                if (result !== 'Success') {
+                    return 'NotLogged';
+                }
+
+                return punch(true);
+            }
+
+            return 'Error';
+        }
+    }
+
+    async function punches() {
+        if (state !== 'Logged') {
+            return state;
+        }
+
+        try {
+            const result = await client.get('punch/punchin');
+
+            if (isLoggedOut(result.headers)) {
+                return 'NotLogged';
+            }
+
+            const data = SchemaGetPunchIn.parse(result.data);
+
+            const punches = data.lastPunches.map((punch) => {
+                return DateTime.fromISO(punch.punchDateTime);
+            });
+
+            return punches;
+        } catch (error) {
+            return 'Error';
+        }
+    }
+
+    const contextValue: AdpContextData = useMemo(() => {
+        return {
+            state,
+            login,
+            punches,
+            punch,
+        };
+    }, [config.adp.activated, state]);
+
+    return (
+        <AdpContext.Provider value={contextValue}>
+            {children}
+        </AdpContext.Provider>
+    );
+}
+
 type AdpContextData = {
+    state: AdpState;
     login(user: string, password: string): Promise<LoginResult>;
-    punches(): Promise<DateTime[] | undefined>;
-    punch(): Promise<void>;
+    punches(): Promise<PunchesResult>;
+    punch(): Promise<PunchResult>;
 };
 
-const AdpContext = createContext<AdpContextData>({} as AdpContextData);
+type AdpState =
+    | 'Unknown'
+    | 'NotInitialized'
+    | 'NotConfigured'
+    | 'NotLogged'
+    | 'Logging'
+    | 'Logged';
 
-type Props = {
-    children?: React.ReactNode;
-};
+type PunchesResult = 'Error' | AdpState | DateTime[];
+export type PunchResult = 'Error' | 'Success' | AdpState;
 
 type LoginResult =
     | 'Success'
@@ -179,238 +383,6 @@ async function login(user: string, password: string): Promise<LoginResult> {
         return 'SessionIdNotFound';
     } catch (error) {
         cleanSession();
-        console.log('Adp login error', error);
         return 'Error';
     }
-}
-
-export function AdpProvider({ children }: Props) {
-    const { config } = useConfig();
-    const toast = useToastController();
-
-    const [logged, setLogged] = useState(false);
-
-    const initialized = useRef(false);
-
-    useForeground(() => {
-        revalidateClient();
-    });
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            revalidateClient();
-        }, 3600000);
-
-        return () => {
-            clearInterval(interval);
-        };
-    }, [config]);
-
-    useEffect(() => {
-        if (initialized.current) {
-            return;
-        }
-
-        initialized.current = true;
-        revalidateClient();
-    }, [config]);
-
-    function revalidateClient() {
-        if (config.adp.activated === false) {
-            return;
-        }
-
-        if (config.adp.user === '' || config.adp.password === '') {
-            return;
-        }
-
-        setLogged(false);
-
-        const initial = DateTime.now().toMillis();
-
-        const sessionId = storage.getString('adp_newexpert_sessionid');
-
-        if (!sessionId) {
-            doLogin();
-            return;
-        }
-
-        const expires = storage.getNumber('adp_session_expires') || 0;
-
-        if (DateTime.now().toUnixInteger() > expires) {
-            doLogin();
-            return;
-        }
-
-        if (Platform.OS === 'ios') {
-            const cookiesString = storage.getString('adp_cookies');
-            const cookies: { [key: string]: Cookie } = cookiesString
-                ? JSON.parse(cookiesString)
-                : {};
-
-            for (const [, cookie] of Object.entries(cookies)) {
-                CookieManager.set(client.defaults.baseURL!, cookie);
-            }
-        }
-
-        client.defaults.headers.common = {
-            ...loggedHeaders(sessionId),
-        };
-
-        client.defaults.params = {
-            lp: 'true',
-        };
-
-        client.get('punch/punchin/user-info').then((result) => {
-            if (isLoggedOut(result.headers)) {
-                doLogin();
-                return;
-            }
-
-            toast.show('Client rehydrated', {
-                message: `In ${DateTime.now().toMillis() - initial}ms`,
-            });
-
-            setLogged(true);
-        });
-    }
-
-    async function doLogin() {
-        return new Promise((resolve, reject) => {
-            const initial = DateTime.now().toMillis();
-            setLogged(false);
-
-            login(config.adp.user, config.adp.password).then((result) => {
-                const time = DateTime.now().toMillis() - initial;
-
-                switch (result) {
-                    case 'Success':
-                        toast.show(`Logged in ADP in ${time}ms`);
-                        setLogged(true);
-                        resolve('Success');
-                        break;
-                    case 'InvalidCredentials':
-                        toast.show('Invalid credentials');
-                        resolve('InvalidCredentials');
-                        break;
-                    case 'SessionIdNotFound':
-                        toast.show('Session ID not found');
-                        resolve('SessionIdNotFound');
-                        break;
-                    case 'PasswordWillExpire':
-                        toast.show('ADP Password will expire soon');
-                        resolve('PasswordWillExpire');
-                        break;
-                    case 'PasswordExpired':
-                        toast.show('Password expired');
-                        resolve('PasswordExpired');
-                        break;
-                    default:
-                        toast.show('Error');
-                        reject('Error');
-                        break;
-                }
-            });
-        });
-    }
-
-    async function punch(isRetry = false) {
-        if (!config.adp.activated) {
-            return;
-        }
-
-        if (!client) {
-            toast.show('Punch not registered in ADP');
-            return;
-        }
-
-        try {
-            const initial = DateTime.now().toMillis();
-            const result = await client.post('punch/punchin', {
-                punchType: 'SPMobile',
-                punchLatitude: null,
-                punchLongitude: null,
-                punchAction: null,
-            });
-
-            if (isLoggedOut(result.headers)) {
-                toast.show('Punch not registered in ADP');
-                return;
-            }
-
-            if (result.status !== 200) {
-                toast.show('Punch not registered in ADP');
-                return;
-            }
-
-            SchemaPostPunchIn.parse(result.data);
-
-            toast.show('Punched in', {
-                message: `In ${DateTime.now().toMillis() - initial}ms`,
-            });
-        } catch (error) {
-            if (!isRetry) {
-                const result = await doLogin();
-
-                if (result === 'Success') {
-                    return punch(true);
-                }
-
-                toast.show('Error', {
-                    message: JSON.stringify(error),
-                });
-            }
-
-            toast.show('Error', {
-                message: JSON.stringify(error),
-            });
-        }
-    }
-
-    async function punches() {
-        if (!client) {
-            toast.show('Punch not registered in ADP');
-            return;
-        }
-
-        try {
-            const result = await client.get('punch/punchin');
-
-            if (isLoggedOut(result.headers)) {
-                toast.show('Error, logged out');
-                console.log(result.data);
-                return;
-            }
-
-            const data = SchemaGetPunchIn.parse(result.data);
-
-            const punches = data.lastPunches.map((punch) => {
-                return DateTime.fromISO(punch.punchDateTime);
-            });
-
-            return punches;
-        } catch (error) {
-            toast.show('Error', {
-                message: JSON.stringify(error),
-            });
-        }
-    }
-
-    const contextValue: AdpContextData = useMemo(() => {
-        return {
-            login,
-            punches,
-            punch,
-        };
-    }, [config.adp.activated, logged]);
-
-    return (
-        <AdpContext.Provider value={contextValue}>
-            {children}
-        </AdpContext.Provider>
-    );
-}
-
-export function useAdp() {
-    return React.useContext(AdpContext);
 }
