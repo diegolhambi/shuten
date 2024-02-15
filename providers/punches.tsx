@@ -71,6 +71,13 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
             throw error;
         }
     },
+    nuke: async () => {
+        await db.runAsync(`DELETE FROM punches;`);
+        set((state) => ({
+            ...state,
+            punches: {},
+        }));
+    },
 }));
 
 type DateRange = [initalDate: DateTime, finalDate: DateTime];
@@ -84,6 +91,7 @@ type PunchStore = {
     insert(
         dateTime?: DateTime
     ): Promise<Exclude<DatabaseOperation, 'Updated' | 'Deleted'>>;
+    nuke(): Promise<void>;
 };
 
 type ResultPunches = {
