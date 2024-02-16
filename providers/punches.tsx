@@ -18,7 +18,7 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
                   type
               FROM punches
               WHERE date >= ? AND date <= ?`,
-            [dates[0].toISO(), dates[1].toISO()]
+            [dates[0].toSQL(), dates[1].toSQL()]
         );
 
         for (const item of result) {
