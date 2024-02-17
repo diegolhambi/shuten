@@ -285,9 +285,8 @@ export default function TabOneScreen() {
                             index % 2 === 0 ? 'Clock in' : 'Clock out';
                         return (
                             <React.Fragment
-                                key={`todayPunch-${
-                                    punch.time
-                                }-${!!punch.predicted}`}
+                                key={`todayPunch-${punch.time
+                                    }-${!!punch.predicted}`}
                             >
                                 {index > 0 && index % 2 === 0 && (
                                     <TimeEntry
@@ -305,7 +304,7 @@ export default function TabOneScreen() {
                                                 {hoursDiff(
                                                     (
                                                         todayPunches[
-                                                            index - 1
+                                                        index - 1
                                                         ] as Punch
                                                     ).time,
                                                     punch.time
@@ -327,7 +326,9 @@ export default function TabOneScreen() {
                                 </TimeEntry>
                             </React.Fragment>
                         );
-                    })}
+                    })
+                }
+
                 {!isNotWorkDay && todayPunches.length > 0 && (
                     <XStack gap="$3" mt="$3" o={haveSomePunch ? 1 : 0.5}>
                         <TimeEntry>
@@ -362,21 +363,10 @@ export default function TabOneScreen() {
 
             <ActionArea>
                 <AnimatePresence>
-                    {loadingApp && (
-                        <LoadingArea key="loading">
-                            <Spinner />
-                            <SizableText>
-                                {
-                                    loadingTexts[
-                                        Math.floor(
-                                            Math.random() * loadingTexts.length
-                                        )
-                                    ]
-                                }
-                            </SizableText>
-                        </LoadingArea>
-                    )}
+                    {loadingApp && <Loading />}
+
                     {!loadingApp && !punching && <ClockArea key="clock" />}
+
                     {!loadingApp && (
                         <PunchButton
                             key="button-punch"
@@ -412,6 +402,26 @@ export default function TabOneScreen() {
                 onOpenChange={handleManualPunchChange}
             />
         </AreaView>
+    );
+}
+
+function Loading() {
+    const text = useMemo(() => {
+        return loadingTexts[
+            Math.floor(
+                Math.random() * loadingTexts.length
+            )
+        ];
+    }, []);
+
+    return (
+        <LoadingArea key="loading">
+            <Spinner />
+            <SizableText>
+                {text}
+            </SizableText>
+        </LoadingArea>
+
     );
 }
 
