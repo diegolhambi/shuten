@@ -1,6 +1,6 @@
 import { PunchType } from '@/types/punch';
 import { useFocusEffect } from 'expo-router';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { SizableText, YStack } from 'tamagui';
 
 export function DayOffMessage({ type = 'dayOff' }: { type?: PunchType }) {
@@ -8,9 +8,7 @@ export function DayOffMessage({ type = 'dayOff' }: { type?: PunchType }) {
 
     const [message, setMessage] = useState(getRandomMessage(group));
 
-    useFocusEffect(() => {
-        setMessage(getRandomMessage(group));
-    });
+    useFocusEffect(useCallback(() => setMessage(getRandomMessage(group)), [group]));
 
     return (
         <YStack alignItems="center" px="$4">
