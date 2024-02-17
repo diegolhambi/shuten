@@ -3,12 +3,15 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "upgrade:tamagui": "bun update '*tamagui*'@latest '@tamagui/*'@latest",
+    "upgrade:tamagui": "bunx npm-check-updates -u *tamagui*",
+    "upgrade:expo": "bunx expo install --fix",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "test": "jest --watchAll"
+    "test": "jest --watchAll",
+    "compile:dev": "eas build --profile development --local",
+    "compile": "eas build --profile preview --local"
   },
   "jest": {
     "preset": "jest-expo"
