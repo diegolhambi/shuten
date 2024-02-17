@@ -40,7 +40,7 @@ export default {
         bundler: 'metro',
         output: 'static',
     },
-    plugins: ['expo-router', 'expo-localization'],
+    plugins: ['expo-font', 'expo-router', 'expo-localization'],
     experiments: {
         typedRoutes: true,
     },
