@@ -54,132 +54,136 @@ export function indexToday(firstDay: number): number {
     return DateTime.now().diff(initialDate, 'days').days;
 }
 
-export function getDayPunches(punches: Punches, config: Config) {
-    const today = DateTime.now();
-
+export function getDailyPunches(punches: Punches, config: Config) {
     return (day: string): Punch[] => {
         const listPunches = punches[day] || [];
 
-        const date = DateTime.fromISO(day);
+        const date = DateTime.fromISO(day) as DateTime<true>;
 
-        const configHours = config.hoursToWork[date.weekday as Weekday] || {
-            punches: [],
-            durations: [],
-        };
-
-        if (
-            listPunches.length === 0 &&
-            configHours.punches.length === 0 &&
-            [6, 7].indexOf(date.weekday) !== -1
-        ) {
-            return [{ time: '00:00', type: 'weekend', predicted: true }];
-        }
-
-        if (
-            listPunches.length === 0 &&
-            configHours.punches.length === 0 &&
-            [1, 2, 3, 4, 5].indexOf(date.weekday) !== -1
-        ) {
-            return [{ time: '00:00', type: 'nonWorkingDay', predicted: true }];
-        }
-
-        if (
-            listPunches.length >= 4 ||
-            listPunches.some((item: Punch) => item.type !== 'punch')
-        ) {
+        if (!date.hasSame(DateTime.now(), 'day')) {
             return listPunches;
         }
 
-        if (!date.hasSame(today, 'day')) {
-            return listPunches;
+        return predictDailyPunches(date, punches, config);
+    };
+}
+
+export function predictDailyPunches(
+    day: DateTime<true>,
+    dbPunches: Punches,
+    config: Config
+): Punch[] {
+    const listPunches = dbPunches[day.toSQLDate()] || [];
+
+    const configHours = config.hoursToWork[day.weekday as Weekday] || {
+        punches: [],
+        durations: [],
+    };
+
+    if (
+        listPunches.length === 0 &&
+        configHours.punches.length === 0 &&
+        [6, 7].indexOf(day.weekday) !== -1
+    ) {
+        return [{ time: '00:00', type: 'weekend', predicted: true }];
+    }
+
+    if (
+        listPunches.length === 0 &&
+        configHours.punches.length === 0 &&
+        [1, 2, 3, 4, 5].indexOf(day.weekday) !== -1
+    ) {
+        return [{ time: '00:00', type: 'nonWorkingDay', predicted: true }];
+    }
+
+    if (
+        listPunches.length >= 4 ||
+        listPunches.some((item: Punch) => item.type !== 'punch')
+    ) {
+        return listPunches;
+    }
+
+    if (configHours.punches.length === 0 && listPunches.length > 0) {
+        return listPunches;
+    }
+
+    const firstPeriod = Duration.fromISO(configHours.durations[0] as string);
+    const lunchPeriod = Duration.fromISO(configHours.durations[1] as string);
+    const secondPeriod = Duration.fromISO(
+        configHours.durations[configHours.durations.length - 1] as string
+    );
+
+    const workDuration = firstPeriod.plus(secondPeriod);
+
+    const calculatedPunches: Punch[] = [];
+
+    for (let index = 0; index < configHours.punches.length; index++) {
+        const element = configHours.punches[index];
+
+        if (listPunches[index]) {
+            calculatedPunches.push(listPunches[index] as Punch);
+            continue;
         }
 
-        if (configHours.punches.length === 0 && listPunches.length > 0) {
-            return listPunches;
+        if (index === 2 && listPunches.at(index - 1)) {
+            calculatedPunches.push({
+                type: 'punch',
+                time: DateTime.fromFormat(
+                    (listPunches[index - 1] as Punch).time,
+                    'HH:mm'
+                )
+                    .plus(lunchPeriod)
+                    .toFormat('HH:mm'),
+                predicted: true,
+            });
+            continue;
         }
 
-        const firstPeriod = Duration.fromISO(
-            configHours.durations[0] as string
-        );
-        const lunchPeriod = Duration.fromISO(
-            configHours.durations[1] as string
-        );
-        const secondPeriod = Duration.fromISO(
-            configHours.durations[configHours.durations.length - 1] as string
-        );
-
-        const workDuration = firstPeriod.plus(secondPeriod);
-
-        const calculatedPunches: Punch[] = [];
-
-        for (let index = 0; index < configHours.punches.length; index++) {
-            const element = configHours.punches[index];
-
-            if (listPunches[index]) {
-                calculatedPunches.push(listPunches[index] as Punch);
-                continue;
-            }
-
-            if (index === 2 && listPunches.at(index - 1)) {
-                calculatedPunches.push({
-                    type: 'punch',
-                    time: DateTime.fromFormat(
-                        (listPunches[index - 1] as Punch).time,
-                        'HH:mm'
-                    )
-                        .plus(lunchPeriod)
-                        .toFormat('HH:mm'),
-                    predicted: true,
-                });
-                continue;
-            }
-
-            if (index === 3 && listPunches.at(2)) {
-                const enter = DateTime.fromFormat(
-                    (listPunches[0] as Punch).time,
-                    'HH:mm'
-                );
-                const lunchOut = DateTime.fromFormat(
-                    (listPunches[1] as Punch).time,
-                    'HH:mm'
-                );
-                const lunchIn = DateTime.fromFormat(
-                    (listPunches[2] as Punch).time,
-                    'HH:mm'
-                );
-
-                calculatedPunches.push({
-                    type: 'punch',
-                    time: lunchIn
-                        .plus(workDuration.minus(lunchOut.diff(enter)))
-                        .toFormat('HH:mm'),
-                    predicted: true,
-                });
-                continue;
-            }
-
-            if (index === 3 && listPunches.at(0)) {
-                calculatedPunches.push({
-                    type: 'punch',
-                    time: DateTime.fromFormat(
-                        (listPunches[0] as Punch).time,
-                        'HH:mm'
-                    )
-                        .plus(workDuration)
-                        .plus(lunchPeriod)
-                        .toFormat('HH:mm'),
-                    predicted: true,
-                });
-                continue;
-            }
+        if (index === 3 && listPunches.at(2)) {
+            const enter = DateTime.fromFormat(
+                (listPunches[0] as Punch).time,
+                'HH:mm'
+            );
+            const lunchOut = DateTime.fromFormat(
+                (listPunches[1] as Punch).time,
+                'HH:mm'
+            );
+            const lunchIn = DateTime.fromFormat(
+                (listPunches[2] as Punch).time,
+                'HH:mm'
+            );
 
             calculatedPunches.push({
                 type: 'punch',
-                time: element as string,
+                time: lunchIn
+                    .plus(workDuration.minus(lunchOut.diff(enter)))
+                    .toFormat('HH:mm'),
                 predicted: true,
             });
+            continue;
         }
 
-        return calculatedPunches;
-    };
+        if (index === 3 && listPunches.at(0)) {
+            calculatedPunches.push({
+                type: 'punch',
+                time: DateTime.fromFormat(
+                    (listPunches[0] as Punch).time,
+                    'HH:mm'
+                )
+                    .plus(workDuration)
+                    .plus(lunchPeriod)
+                    .toFormat('HH:mm'),
+                predicted: true,
+            });
+            continue;
+        }
+
+        calculatedPunches.push({
+            type: 'punch',
+            time: element as string,
+            predicted: true,
+        });
+    }
+
+    return calculatedPunches;
 }

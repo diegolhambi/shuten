@@ -6,7 +6,7 @@ import { usePunchStore } from '@/providers/punches';
 import { useForeground } from '@/utils/app-state';
 import {
     days,
-    getDayPunches,
+    getDailyPunches,
     indexToday,
     monthDaysRange,
 } from '@/utils/punch-list';
@@ -68,7 +68,7 @@ export default function PunchesList() {
         return () => clearTimeout(timer);
     }, []);
 
-    const getPunches = useCallback(getDayPunches(punches, config), [
+    const getPunches = useCallback(getDailyPunches(punches, config), [
         punches,
         JSON.stringify(config),
     ]);

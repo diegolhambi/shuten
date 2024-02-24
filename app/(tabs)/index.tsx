@@ -10,7 +10,7 @@ import { useNotification } from '@/providers/notification-manager';
 import { usePunchStore } from '@/providers/punches';
 import { Punch } from '@/types/punch';
 import { hoursDiff } from '@/utils/date';
-import { getDayPunches, monthDaysRange } from '@/utils/punch-list';
+import { getDailyPunches, monthDaysRange } from '@/utils/punch-list';
 import {
     CheckCheck,
     CookingPot,
@@ -101,7 +101,7 @@ export default function TabOneScreen() {
     }, [JSON.stringify(config), today.toISODate()]);
 
     const todayPunches = useMemo(() => {
-        return getDayPunches(punches, config)(today.toISODate());
+        return getDailyPunches(punches, config)(today.toISODate());
     }, [punches, today.toISODate()]);
 
     const isNotWorkDay = useMemo(() => {
@@ -285,8 +285,9 @@ export default function TabOneScreen() {
                             index % 2 === 0 ? 'Clock in' : 'Clock out';
                         return (
                             <React.Fragment
-                                key={`todayPunch-${punch.time
-                                    }-${!!punch.predicted}`}
+                                key={`todayPunch-${
+                                    punch.time
+                                }-${!!punch.predicted}`}
                             >
                                 {index > 0 && index % 2 === 0 && (
                                     <TimeEntry
@@ -304,7 +305,7 @@ export default function TabOneScreen() {
                                                 {hoursDiff(
                                                     (
                                                         todayPunches[
-                                                        index - 1
+                                                            index - 1
                                                         ] as Punch
                                                     ).time,
                                                     punch.time
@@ -326,8 +327,7 @@ export default function TabOneScreen() {
                                 </TimeEntry>
                             </React.Fragment>
                         );
-                    })
-                }
+                    })}
 
                 {!isNotWorkDay && todayPunches.length > 0 && (
                     <XStack gap="$3" mt="$3" o={haveSomePunch ? 1 : 0.5}>
@@ -407,21 +407,14 @@ export default function TabOneScreen() {
 
 function Loading() {
     const text = useMemo(() => {
-        return loadingTexts[
-            Math.floor(
-                Math.random() * loadingTexts.length
-            )
-        ];
+        return loadingTexts[Math.floor(Math.random() * loadingTexts.length)];
     }, []);
 
     return (
         <LoadingArea key="loading">
             <Spinner />
-            <SizableText>
-                {text}
-            </SizableText>
+            <SizableText>{text}</SizableText>
         </LoadingArea>
-
     );
 }
 
