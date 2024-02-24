@@ -58,7 +58,7 @@ export function ManualPunch(
         insert(date).then((value) => {
             if (value === 'Inserted') {
                 toast.show('Manual punch added', {
-                    message: fDateShort(date) + ' ' + fTime(date),
+                    message: `${fDateShort(date)} ${fTime(date)}`,
                 });
             } else {
                 toast.show('Punch already exists', {
