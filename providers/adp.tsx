@@ -33,9 +33,33 @@ export function AdpProvider({ children }: { children?: React.ReactNode }) {
     const [state, setState] = useState<AdpState>('Unknown');
 
     const initialized = useRef(false);
+    const tries = useRef(0);
+
+    useEffect(() => {
+        switch (state) {
+            case 'Unknown':
+                revalidateClient();
+                break;
+
+            case 'NotLogged':
+                if (tries.current >= 3) {
+                    setState('NotConfigured');
+                    return;
+                }
+
+                tries.current += 1;
+                revalidateClient();
+                break;
+
+            case 'Logged':
+            case 'NotConfigured':
+                tries.current = 0;
+                break;
+        }
+    }, [state]);
 
     const callRevalidateClient = useCallback(() => {
-        revalidateClient();
+        setState('Unknown');
     }, [JSON.stringify(config)]);
 
     useForeground(callRevalidateClient);
