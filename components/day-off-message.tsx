@@ -8,7 +8,9 @@ export function DayOffMessage({ type = 'dayOff' }: { type?: PunchType }) {
 
     const [message, setMessage] = useState(getRandomMessage(group));
 
-    useFocusEffect(useCallback(() => setMessage(getRandomMessage(group)), [group]));
+    useFocusEffect(
+        useCallback(() => setMessage(getRandomMessage(group)), [group])
+    );
 
     return (
         <YStack alignItems="center" px="$4">
