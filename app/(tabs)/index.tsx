@@ -257,8 +257,6 @@ export default function TabOneScreen() {
             return;
         }
 
-        notification.scheduleNext(punchDate, todayPunches);
-
         setPunching(false);
     };
 

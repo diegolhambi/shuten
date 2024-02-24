@@ -2,6 +2,7 @@ import { db } from '@/providers/database';
 import { Punch, PunchType } from '@/types/punch';
 import { DateTime } from 'luxon';
 import { create } from 'zustand';
+import { DeviceEventEmitter } from 'react-native';
 
 export const usePunchStore = create<PunchStore>((set, get) => ({
     state: 'Unloaded',
@@ -36,7 +37,7 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
     },
     insert: async (dateTime = DateTime.now(), type: PunchType = 'punch') => {
         try {
-            await db.runAsync(`INSERT INTO punches VALUES (?, ?);`, [
+            await db.runAsync('INSERT INTO punches VALUES (?, ?);', [
                 dateTime.toFormat('yyyy-LL-dd HH:mm'),
                 type,
             ]);
@@ -60,6 +61,11 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
                 punches: newPunches,
             }));
 
+            DeviceEventEmitter.emit('punch-inserted', {
+                dateTime,
+                type,
+            });
+
             return 'Inserted';
         } catch (error: any) {
             if (
@@ -73,7 +79,7 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
     },
     remove: async (dateTime) => {
         try {
-            await db.runAsync(`DELETE FROM punches WHERE date = ?;`, [
+            await db.runAsync('DELETE FROM punches WHERE date = ?;', [
                 dateTime.toFormat('yyyy-LL-dd HH:mm'),
             ]);
 
@@ -99,7 +105,7 @@ export const usePunchStore = create<PunchStore>((set, get) => ({
         }
     },
     nuke: async () => {
-        await db.runAsync(`DELETE FROM punches;`);
+        await db.runAsync('DELETE FROM punches;');
         set((state) => ({
             ...state,
             punches: {},

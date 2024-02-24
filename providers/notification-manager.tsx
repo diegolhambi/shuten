@@ -11,7 +11,24 @@ import { useConfig } from './config';
 
 export function NotificationProvider({ children }: Props) {
     const { config } = useConfig();
+    const { punches } = usePunchStore();
     const [granted, setGranted] = useState<boolean | undefined>();
+
+    useEffect(() => {
+        const listener = DeviceEventEmitter.addListener(
+            'punch-inserted',
+            (punch: { dateTime: DateTime; type: PunchType }) => {
+                scheduleNext(
+                    punch.dateTime,
+                    predictDailyPunches(punch.dateTime, punches, config)
+                );
+            }
+        );
+
+        return () => {
+            listener.remove();
+        };
+    }, [granted, punches, config]);
 
     useEffect(() => {
         registerChannels();
