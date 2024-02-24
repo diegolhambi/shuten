@@ -3,6 +3,7 @@ import Clock from '@/components/clock';
 import { DateHeader } from '@/components/date-header';
 import { DayOffMessage } from '@/components/day-off-message';
 import { ManualPunch } from '@/components/manual-punch';
+import { PunchUnsuccessful } from '@/components/punch-unsuccessful';
 import { TimeEntry } from '@/components/time-entry';
 import { PunchResult, useAdp } from '@/providers/adp';
 import { useConfig } from '@/providers/config';
@@ -48,6 +49,7 @@ export default function TabOneScreen() {
     const [punching, setPunching] = useState(false);
 
     const [openManualPunch, setOpenManualPunch] = useState(false);
+    const [openPunchUnsuccessful, setOpenPunchUnsuccessful] = useState(false);
 
     const {
         state: punchState,
@@ -87,7 +89,7 @@ export default function TabOneScreen() {
 
                 notification.scheduleFirstPunch(punches);
             });
-        }, [punches])
+        }, [JSON.stringify(config), punchState])
     );
 
     const loadingApp = useMemo(() => {
@@ -230,6 +232,7 @@ export default function TabOneScreen() {
 
             await removePunch(punchDate);
 
+            setOpenPunchUnsuccessful(true);
             setPunching(false);
             return;
         }
@@ -253,6 +256,7 @@ export default function TabOneScreen() {
 
             await removePunch(punchDate);
 
+            setOpenPunchUnsuccessful(true);
             setPunching(false);
             return;
         }
@@ -398,6 +402,10 @@ export default function TabOneScreen() {
             <ManualPunch
                 open={openManualPunch}
                 onOpenChange={handleManualPunchChange}
+            />
+            <PunchUnsuccessful
+                open={openPunchUnsuccessful}
+                onOpenChange={setOpenPunchUnsuccessful}
             />
         </AreaView>
     );
