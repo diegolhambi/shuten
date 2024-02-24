@@ -55,10 +55,10 @@ export function NotificationProvider({ children }: Props) {
                 minutes: config.notification.howEarly,
             });
 
-            const message =
-                textEarlyNotifications[punch][
-                    Math.random() * (textEarlyNotifications[punch].length - 1)
-                ];
+            const index = Math.floor(
+                Math.random() * textNotications[punch].length
+            );
+            const message = textEarlyNotifications[punch][index];
 
             Notifications.scheduleNotificationAsync({
                 content: {
@@ -77,12 +77,15 @@ export function NotificationProvider({ children }: Props) {
         }
 
         if (notificationConfig.onTime) {
+            const index = Math.floor(
+                Math.random() * textNotications[punch].length
+            );
+            const message = textNotications[punch][index];
+
             Notifications.scheduleNotificationAsync({
                 content: {
                     categoryIdentifier: 'punch',
-                    ...textNotications[punch][
-                        Math.random() * (textNotications[punch].length - 1)
-                    ],
+                    ...message,
                 },
                 identifier: `punch_${punch}_${time.toFormat(
                     'yyyy-MM-dd_HH-mm'
