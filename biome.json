@@ -19,7 +19,7 @@
                 "noExplicitAny": "off",
                 "noArrayIndexKey": "off",
                 "noDoubleEquals": "off",
-                "noConsoleLog": "error",
+                "noConsoleLog": "warn",
                 "noAssignInExpressions": "off",
                 "noRedeclare": "off"
             },
@@ -27,11 +27,11 @@
                 "noParameterAssign": "off",
                 "noNonNullAssertion": "off",
                 "noArguments": "off",
-                "noUnusedTemplateLiteral": "off",
+                "noUnusedTemplateLiteral": "error",
                 "useDefaultParameterLast": "off",
-                "useConst": "off",
+                "useConst": "error",
                 "useEnumInitializers": "off",
-                "useTemplate": "off",
+                "useTemplate": "error",
                 "useSelfClosingElements": "off"
             },
             "security": {
