@@ -3,7 +3,7 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "upgrade:tamagui": "bunx npm-check-updates -u *tamagui*",
+    "upgrade:tamagui": "bunx npm-check-updates -u '*tamagui*'",
     "upgrade:expo": "bunx expo install --fix",
     "start": "expo start",
     "android": "expo run:android",
