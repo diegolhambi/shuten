@@ -22,7 +22,6 @@ function dateTextNow() {
 
 export default function Clock() {
     const [time, setTime] = useState(DateTime.now().toLocaleString(format));
-    const today = useMemo(() => dateTextNow(), [DateTime.now().toISODate()]);
 
     useEffect(() => {
         const interval = setInterval(() => {
