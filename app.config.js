@@ -40,22 +40,7 @@ export default {
         bundler: 'metro',
         output: 'static',
     },
-    plugins: [
-        'expo-font',
-        'expo-router',
-        'expo-localization',
-        [
-            'expo-build-properties',
-            {
-                ios: {
-                    newArchEnabled: true
-                },
-                android: {
-                    newArchEnabled: true
-                }
-            }
-        ]
-    ],
+    plugins: ['expo-font', 'expo-router', 'expo-localization'],
     experiments: {
         typedRoutes: true,
     },
