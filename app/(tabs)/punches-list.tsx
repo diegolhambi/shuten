@@ -7,16 +7,17 @@ import { useForeground } from '@/utils/app-state';
 import type { Weekday } from '@/utils/date';
 import {
     days,
-    getDailyPunches,
+    hoursToBeWorked,
     monthDaysRange,
     predictDailyPunches,
+    workedTimeFromPunches,
 } from '@/utils/punch-list';
 import { toDateId } from '@marceloterreiro/flash-calendar';
 import { fromDateId } from '@marceloterreiro/flash-calendar/src/helpers/dates';
 import { Calendar as CalendarIcon, MoreVertical } from '@tamagui/lucide-icons';
 import { Stack, router } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { DateTime } from 'luxon';
+import { DateTime, Duration } from 'luxon';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
     Button,
@@ -76,6 +77,31 @@ export default function PunchesScreen() {
         [JSON.stringify(punches)]
     );
 
+    const { monthTotalWorked, monthTotalOvertime } = useMemo(() => {
+        let worked = Duration.fromISO('PT0H0M') as Duration<true>;
+        let overtime = Duration.fromISO('PT0H0M') as Duration<true>;
+
+        const keys = Object.keys(punches);
+
+        for (const key of keys) {
+            const day = DateTime.fromSQL(key) as DateTime<true>;
+
+            const a = workedTimeFromPunches(day, punches[key]);
+            const b = hoursToBeWorked(day, config);
+
+            worked = worked.plus(a);
+
+            if (a.toMillis() > b.toMillis()) {
+                overtime = overtime.plus(a.minus(b));
+            }
+        }
+
+        return {
+            monthTotalWorked: worked,
+            monthTotalOvertime: overtime,
+        };
+    }, [punches, config]);
+
     const updateDate = useCallback(() => {
         setToday(DateTime.now());
     }, []);
@@ -93,11 +119,6 @@ export default function PunchesScreen() {
 
         return () => clearTimeout(timer);
     }, []);
-
-    const getPunches = useCallback(getDailyPunches(punches, config), [
-        punches,
-        JSON.stringify(config),
-    ]);
 
     function handleCalendarDateChange(date: string) {
         setSelectedCalendarDate((prev) =>
@@ -216,7 +237,7 @@ export default function PunchesScreen() {
                 >
                     <SizableText size="$5">Hours worked</SizableText>
                     <SizableText size="$8" fontFamily="$tabular">
-                        45:00
+                        {monthTotalWorked.toFormat('hh:mm')}
                     </SizableText>
                 </YStack>
                 <YStack
@@ -227,7 +248,7 @@ export default function PunchesScreen() {
                 >
                     <SizableText size="$5">Overtime</SizableText>
                     <SizableText size="$8" fontFamily="$tabular">
-                        15:00
+                        {monthTotalOvertime.toFormat('hh:mm')}
                     </SizableText>
                 </YStack>
                 <YStack

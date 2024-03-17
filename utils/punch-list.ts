@@ -187,3 +187,59 @@ export function predictDailyPunches(
 
     return calculatedPunches;
 }
+
+export function workedTimeFromPunches(
+    date: DateTime<true>,
+    punches: Punch[]
+): Duration<true> {
+    const startTimes = punches
+        .filter((_, index) => index % 2 === 0)
+        .map(
+            (punch) =>
+                DateTime.fromSQL(
+                    `${date.toSQLDate()} ${punch.time}`
+                ) as DateTime<true>
+        );
+
+    const endTimes = punches
+        .filter((_, index) => index % 2 === 1)
+        .map(
+            (punch) =>
+                DateTime.fromSQL(
+                    `${date.toSQLDate()} ${punch.time}`
+                ) as DateTime<true>
+        );
+
+    const workedDurations = endTimes.map((end, index) =>
+        end.diff(startTimes[index]).rescale()
+    );
+
+    return Duration.fromISO(
+        workedDurations.reduce((acc, value) => {
+            return Duration.fromISO(acc)
+                .plus(value)
+                .rescale()
+                .toISO() as string;
+        }, 'PT0H0M')
+    ) as Duration<true>;
+}
+
+export function hoursToBeWorked(date: DateTime, config: Config) {
+    const configuredWorkShift = config.hoursToWork[date.weekday as Weekday];
+
+    const isoTotalHours = configuredWorkShift.durations.reduce(
+        (acc, value, index) => {
+            if (index % 2 === 0) {
+                return Duration.fromISO(acc)
+                    .plus(Duration.fromISO(value))
+                    .rescale()
+                    .toISO() as string;
+            }
+
+            return acc;
+        },
+        'PT0H0M'
+    );
+
+    return Duration.fromISO(isoTotalHours) as Duration<true>;
+}
