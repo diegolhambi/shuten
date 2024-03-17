@@ -123,6 +123,16 @@ export function usePunchCalculation(params: {
             return true;
         }
 
+        if (
+            punches[validDate.toSQLDate()] &&
+            punches[validDate.toSQLDate()].every(
+                (punch) => punch.type === 'punch'
+            ) &&
+            punches[validDate.toSQLDate()].length % 2 !== 0
+        ) {
+            return true;
+        }
+
         if (hasUnworkedTime) {
             return true;
         }
