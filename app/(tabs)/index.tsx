@@ -137,35 +137,41 @@ export default function TabOneScreen() {
     const totalWorkedHours = useMemo(() => {
         const tempPunches = punches[today.toISODate()] || [];
 
-        const totalDuration = tempPunches.reduce(
-            (acc, punch, index, punches) => {
-                const start = DateTime.fromISO(punch.time);
+        const startTimes = tempPunches
+            .filter((_, index) => index % 2 === 0)
+            .map(
+                (punch) =>
+                    DateTime.fromSQL(
+                        `${today.toSQLDate()} ${punch.time}`
+                    ) as DateTime<true>
+            );
 
-                if (index % 2 === 0) {
-                    const end = punches[index + 1]
-                        ? DateTime.fromISO(punches[index + 1].time)
-                        : today;
+        const endTimes = tempPunches
+            .filter((_, index) => index % 2 === 1)
+            .map(
+                (punch) =>
+                    DateTime.fromSQL(
+                        `${today.toSQLDate()} ${punch.time}`
+                    ) as DateTime<true>
+            );
 
-                    return Duration.fromISO(acc)
-                        .plus(end.diff(start))
-                        .rescale()
-                        .toISO() as string;
-                }
+        if (startTimes.length !== endTimes.length) {
+            endTimes.push(today);
+        }
 
-                if (punches.length === 2 && index === 1) {
-                    return Duration.fromISO(acc)
-                        .minus(Duration.fromISO(todayHoursToWork.durations[1]))
-                        .plus(today.diff(DateTime.fromISO(punch.time)))
-                        .rescale()
-                        .toISO() as string;
-                }
-
-                return acc;
-            },
-            'PT0H0M'
+        const workedDurations = endTimes.map(
+            (end, index) =>
+                end.diff(startTimes[index]).rescale() as Duration<true>
         );
 
-        return Duration.fromISO(totalDuration);
+        const total = workedDurations.reduce((acc, value) => {
+            return Duration.fromISO(acc)
+                .plus(value)
+                .rescale()
+                .toISO() as string;
+        }, 'PT0H0M');
+
+        return Duration.fromISO(total);
     }, [today, punches]);
 
     const totalOvertime = useMemo(() => {
