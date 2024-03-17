@@ -100,6 +100,7 @@ export default function TabOneScreen() {
         hoursWorked,
         hasOvertime,
         overtimeWorked,
+        hasPunches,
     } = usePunchCalculation({
         date: today,
         considerNow: true,
@@ -123,12 +124,6 @@ export default function TabOneScreen() {
 
     const dayType = useMemo(() => {
         return todayPunches[0]?.type;
-    }, [todayPunches]);
-
-    const haveSomePunch = useMemo(() => {
-        return todayPunches.some((punch: Punch) => {
-            return !punch.predicted && punch.type === 'punch';
-        });
     }, [todayPunches]);
 
     const PunchIcon = useMemo(() => {
@@ -285,7 +280,7 @@ export default function TabOneScreen() {
                     })}
 
                 {!isNotWorkDay && todayPunches.length > 0 && (
-                    <XStack gap="$3" mt="$3" o={haveSomePunch ? 1 : 0.5}>
+                    <XStack gap="$3" mt="$3" o={hasPunches ? 1 : 0.5}>
                         <TimeEntry>
                             <TimeEntry.Icon>
                                 <EqualSquare size="$1" />

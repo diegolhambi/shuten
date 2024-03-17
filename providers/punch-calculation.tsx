@@ -144,6 +144,16 @@ export function usePunchCalculation(params: {
         return overtimeWorked.shiftTo('minutes').minutes > 0;
     }, [overtimeWorked]);
 
+    const hasPunches = useMemo(() => {
+        return (
+            punches[validDate.toSQLDate()] &&
+            punches[validDate.toSQLDate()].length > 0 &&
+            punches[validDate.toSQLDate()].every(
+                (punch) => punch.type === 'punch'
+            )
+        );
+    }, [punches]);
+
     return {
         configuredWorkShift,
         hoursToBeWorked,
@@ -152,5 +162,6 @@ export function usePunchCalculation(params: {
         hasUnworkedTime,
         hasInconsistency,
         hasOvertime,
+        hasPunches,
     };
 }

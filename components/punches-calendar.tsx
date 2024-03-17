@@ -114,8 +114,13 @@ const PunchesCalendarItemDayWithContainer = ({
         return DateTime.fromJSDate(metadata.date) as DateTime<true>;
     }, [metadata.id]);
 
-    const { hasInconsistency, hasUnworkedTime, hasOvertime, overtimeWorked } =
-        usePunchCalculation({ date });
+    const {
+        hasInconsistency,
+        hasUnworkedTime,
+        hasOvertime,
+        hasPunches,
+        overtimeWorked,
+    } = usePunchCalculation({ date });
 
     return (
         <Calendar.Item.Day.Container
@@ -161,18 +166,19 @@ const PunchesCalendarItemDayWithContainer = ({
                         check
                     </Text>
                 )}
-                {!hasInconsistency && hasOvertime && (
-                    <Text
-                        fontSize={10}
-                        fontFamily="$tabular"
-                        themeInverse={
-                            metadata.state === 'active' ? true : false
-                        }
-                        color={metadata.isDisabled ? '$gray8' : '$gray11'}
-                    >
-                        {overtimeWorked.toFormat('h:mm')}
-                    </Text>
-                )}
+                {!hasInconsistency &&
+                    (hasOvertime || (hasPunches && !metadata.isToday)) && (
+                        <Text
+                            fontSize={10}
+                            fontFamily="$tabular"
+                            themeInverse={
+                                metadata.state === 'active' ? true : false
+                            }
+                            color={metadata.isDisabled ? '$gray8' : '$gray11'}
+                        >
+                            {overtimeWorked.toFormat('h:mm')}
+                        </Text>
+                    )}
             </Calendar.Item.Day>
         </Calendar.Item.Day.Container>
     );
