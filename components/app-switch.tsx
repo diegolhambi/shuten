@@ -1,4 +1,4 @@
-import { getVariableValue, SizeTokens, styled } from '@tamagui/core';
+import { getVariableValue, type SizeTokens, styled } from '@tamagui/core';
 import { getSize } from '@tamagui/get-token';
 import { ThemeableStack, YStack } from '@tamagui/stacks';
 import { createSwitch } from '@tamagui/switch';

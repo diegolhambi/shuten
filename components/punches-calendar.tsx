@@ -3,8 +3,8 @@ import { useConfig } from '@/providers/config';
 import { usePunchStore } from '@/providers/punches';
 import {
     Calendar,
-    CalendarItemDayWithContainerProps,
-    CalendarProps,
+    type CalendarItemDayWithContainerProps,
+    type CalendarProps,
     activeDateRangesEmitter,
     useOptimizedDayMetadata,
 } from '@marceloterreiro/flash-calendar';

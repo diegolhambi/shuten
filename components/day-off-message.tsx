@@ -1,4 +1,4 @@
-import { PunchType } from '@/types/punch';
+import type { PunchType } from '@/types/punch';
 import { useFocusEffect } from 'expo-router';
 import { useCallback, useState } from 'react';
 import { SizableText, YStack } from 'tamagui';

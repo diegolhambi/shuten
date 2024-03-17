@@ -1,5 +1,6 @@
 import { openDatabaseSync } from 'expo-sqlite/next';
-import React, { createContext, useEffect } from 'react';
+import type React from 'react';
+import { createContext, useEffect } from 'react';
 
 export const db = openDatabaseSync('data.db');
 

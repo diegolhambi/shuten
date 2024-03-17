@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Platform, Vibration } from 'react-native';
-import { SheetProps, Sheet, SizableText } from 'tamagui';
+import { type SheetProps, Sheet, SizableText } from 'tamagui';
 
 export function PunchUnsuccessful(props: SheetProps) {
     useEffect(() => {

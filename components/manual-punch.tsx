@@ -10,7 +10,7 @@ import {
     Button,
     Label,
     Sheet,
-    SheetProps,
+    type SheetProps,
     SizableText,
     XStack,
     YStack,

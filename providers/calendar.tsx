@@ -13,7 +13,7 @@ import {
 } from '@marceloterreiro/flash-calendar/src/helpers/dates';
 import { range } from '@marceloterreiro/flash-calendar/src/helpers/numbers';
 import { DateTime } from 'luxon';
-import {
+import type {
     CalendarDayMetadata,
     UseCalendarParams,
 } from '@marceloterreiro/flash-calendar';

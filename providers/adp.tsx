@@ -1,6 +1,6 @@
-import CookieManager, { Cookie } from '@react-native-cookies/cookies';
+import CookieManager, { type Cookie } from '@react-native-cookies/cookies';
 import { useToastController } from '@tamagui/toast';
-import axios, { RawAxiosRequestHeaders } from 'axios';
+import axios, { type RawAxiosRequestHeaders } from 'axios';
 import { DateTime } from 'luxon';
 import qs from 'qs';
 import React, {

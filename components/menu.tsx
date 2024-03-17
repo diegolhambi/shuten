@@ -1,11 +1,11 @@
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import {
     Sheet,
-    SheetProps,
+    type SheetProps,
     SizableText,
-    TextProps,
+    type TextProps,
     XStack,
-    XStackProps,
+    type XStackProps,
     withStaticProperties,
 } from 'tamagui';
 

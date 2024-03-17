@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { AppState, AppStateStatus } from 'react-native';
+import { AppState, type AppStateStatus } from 'react-native';
 
 export function useForeground(fn: () => void) {
     const appState = useRef(AppState.currentState);

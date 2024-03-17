@@ -2,9 +2,9 @@ import * as Notifications from 'expo-notifications';
 import { DateTime } from 'luxon';
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { Punches, usePunchStore } from '@/providers/punches';
-import { Punch, PunchType } from '@/types/punch';
-import { Weekday } from '@/utils/date';
+import { type Punches, usePunchStore } from '@/providers/punches';
+import type { Punch, PunchType } from '@/types/punch';
+import type { Weekday } from '@/utils/date';
 import { predictDailyPunches } from '@/utils/punch-list';
 import { DeviceEventEmitter } from 'react-native';
 import { useConfig } from './config';

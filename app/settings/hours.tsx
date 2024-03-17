@@ -17,8 +17,8 @@ import {
 } from 'tamagui';
 
 import { AppSwitch } from '@/components/app-switch';
-import { defaultHourToWork, HoursToWork, useConfig } from '@/providers/config';
-import { getWeekdays, is24hourClock, ParseTime, Weekday } from '@/utils/date';
+import { defaultHourToWork, type HoursToWork, useConfig } from '@/providers/config';
+import { getWeekdays, is24hourClock, ParseTime, type Weekday } from '@/utils/date';
 
 const textWeekdays = {
     short: getWeekdays(),
@@ -146,7 +146,7 @@ function ConfigHours() {
     const [weekdays, setWeekdays] = useState<Weekday[]>(() => {
         return Object.entries(config.hoursToWork)
             .filter(([, value]) => value.punches.length > 0)
-            .map(([key]) => parseInt(key as string, 10) as Weekday)
+            .map(([key]) => Number.parseInt(key as string, 10) as Weekday)
             .sort();
     });
 
@@ -172,7 +172,7 @@ function ConfigHours() {
             return;
         }
 
-        const newWeekdays = value.map((i) => parseInt(i, 10) as Weekday).sort();
+        const newWeekdays = value.map((i) => Number.parseInt(i, 10) as Weekday).sort();
 
         setWeekdays(newWeekdays);
 

@@ -1,5 +1,5 @@
 import { db } from '@/providers/database';
-import { Punch, PunchType } from '@/types/punch';
+import type { Punch, PunchType } from '@/types/punch';
 import { DateTime } from 'luxon';
 import { create } from 'zustand';
 import { DeviceEventEmitter } from 'react-native';

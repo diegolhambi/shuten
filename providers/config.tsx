@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useMemo, useState } from 'react';
 
-import { Weekday } from '@/utils/date';
+import type { Weekday } from '@/utils/date';
 import { storage } from '@/utils/storage';
 
 export type HoursToWork = {
