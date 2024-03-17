@@ -126,6 +126,22 @@ export default function PunchesScreen() {
         );
     }
 
+    function getTimeForDate(date: DateTime<true>) {
+        const time = workedTimeFromPunches(
+            date,
+            punches[date.toSQLDate()] || []
+        );
+        const b = hoursToBeWorked(date, config);
+
+        if (time.toMillis() > b.toMillis()) {
+            return `${b.toFormat('hh:mm')} + ${time
+                .minus(b)
+                .toFormat('hh:mm')}`;
+        }
+
+        return time.toFormat('hh:mm');
+    }
+
     return (
         <ScrollView onLayout={() => SplashScreen.hideAsync()}>
             <Stack.Screen
@@ -190,15 +206,27 @@ export default function PunchesScreen() {
                     py="$4"
                     gap="$4"
                 >
-                    <SizableText size="$7">
-                        {DateTime.fromJSDate(
-                            fromDateId(selectedCalendarDate)
-                        ).toLocaleString({
-                            localeMatcher: 'lookup',
-                            day: 'numeric',
-                            month: 'long',
-                        })}
-                    </SizableText>
+                    <XStack
+                        alignItems="baseline"
+                        justifyContent="space-between"
+                    >
+                        <SizableText size="$7">
+                            {DateTime.fromJSDate(
+                                fromDateId(selectedCalendarDate)
+                            ).toLocaleString({
+                                localeMatcher: 'lookup',
+                                day: 'numeric',
+                                month: 'long',
+                            })}
+                        </SizableText>
+                        <SizableText size="$4" color="$gray11">
+                            {getTimeForDate(
+                                DateTime.fromSQL(
+                                    selectedCalendarDate
+                                ) as DateTime<true>
+                            )}
+                        </SizableText>
+                    </XStack>
                     <XGroup alignSelf="center">
                         {predictDailyPunches(
                             DateTime.fromSQL(
