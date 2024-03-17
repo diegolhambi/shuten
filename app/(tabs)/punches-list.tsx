@@ -4,7 +4,7 @@ import { PunchesCalendar } from '@/components/punches-calendar';
 import { useConfig } from '@/providers/config';
 import { usePunchStore } from '@/providers/punches';
 import { useForeground } from '@/utils/app-state';
-import { Weekday } from '@/utils/date';
+import type { Weekday } from '@/utils/date';
 import {
     days,
     getDailyPunches,
@@ -14,7 +14,8 @@ import {
 import { toDateId } from '@marceloterreiro/flash-calendar';
 import { fromDateId } from '@marceloterreiro/flash-calendar/src/helpers/dates';
 import { Calendar as CalendarIcon, MoreVertical } from '@tamagui/lucide-icons';
-import { SplashScreen, Stack, router } from 'expo-router';
+import { Stack, router } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { DateTime } from 'luxon';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import {
@@ -265,7 +266,7 @@ export default function PunchesScreen() {
                 <Menu.Item
                     onPress={() => {
                         setOpenMenu(false);
-                        router.push('/adp-punches');
+                        router.navigate('/adp-punches');
                     }}
                 >
                     List ADP punches
@@ -282,7 +283,7 @@ export default function PunchesScreen() {
                         </Menu.Item>
                         <Menu.Item
                             onPress={() => {
-                                router.push(
+                                router.navigate(
                                     '/settings/scheduled-notifications'
                                 );
                                 setOpenMenu(false);
@@ -294,7 +295,7 @@ export default function PunchesScreen() {
                 ) : null}
                 <Menu.Item
                     onPress={() => {
-                        router.push('/settings');
+                        router.navigate('/settings');
                         setOpenMenu(false);
                     }}
                     onLongPress={() => {

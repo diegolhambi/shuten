@@ -5,11 +5,11 @@ import { DayOffMessage } from '@/components/day-off-message';
 import { ManualPunch } from '@/components/manual-punch';
 import { PunchUnsuccessful } from '@/components/punch-unsuccessful';
 import { TimeEntry } from '@/components/time-entry';
-import { PunchResult, useAdp } from '@/providers/adp';
+import { useAdp, type PunchResult } from '@/providers/adp';
 import { useConfig } from '@/providers/config';
 import { useNotification } from '@/providers/notification-manager';
 import { usePunchStore } from '@/providers/punches';
-import { Punch } from '@/types/punch';
+import type { Punch } from '@/types/punch';
 import { hoursDiff } from '@/utils/date';
 import { getDailyPunches, monthDaysRange } from '@/utils/punch-list';
 import {
@@ -21,7 +21,8 @@ import {
     Plus,
 } from '@tamagui/lucide-icons';
 import { useToastController } from '@tamagui/toast';
-import { SplashScreen, useFocusEffect } from 'expo-router';
+import { useFocusEffect } from 'expo-router';
+import * as SplashScreen from 'expo-splash-screen';
 import { DateTime, Duration } from 'luxon';
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import { Platform, Vibration } from 'react-native';
