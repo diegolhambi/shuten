@@ -8,6 +8,7 @@ import { TimeEntry } from '@/components/time-entry';
 import { useAdp, type PunchResult } from '@/providers/adp';
 import { useConfig } from '@/providers/config';
 import { useNotification } from '@/providers/notification-manager';
+import { usePunchCalculation } from '@/providers/punch-calculation';
 import { usePunchStore } from '@/providers/punches';
 import type { Punch } from '@/types/punch';
 import { hoursDiff } from '@/utils/date';
@@ -93,15 +94,22 @@ export default function TabOneScreen() {
         }, [JSON.stringify(config), punchState])
     );
 
+    const {
+        configuredWorkShift,
+        hoursToBeWorked,
+        hoursWorked,
+        hasOvertime,
+        overtimeWorked,
+    } = usePunchCalculation({
+        date: today,
+        considerNow: true,
+    });
+
     const loadingApp = useMemo(() => {
         const needAdpToLoad = config.adp.activated && adpState !== 'Logged';
 
         return needAdpToLoad || punchState !== 'Loaded';
     }, [JSON.stringify(config), adpState, punchState]);
-
-    const todayHoursToWork = useMemo(() => {
-        return config.hoursToWork[today.weekday];
-    }, [JSON.stringify(config), today.toISODate()]);
 
     const todayPunches = useMemo(() => {
         return getDailyPunches(punches, config)(today.toISODate());
@@ -116,68 +124,6 @@ export default function TabOneScreen() {
     const dayType = useMemo(() => {
         return todayPunches[0]?.type;
     }, [todayPunches]);
-
-    const totalHoursToWork = useMemo(() => {
-        const isoTotalHours = todayHoursToWork.durations.reduce(
-            (acc, value, index) => {
-                if (index % 2 === 0) {
-                    return Duration.fromISO(acc)
-                        .plus(Duration.fromISO(value))
-                        .rescale()
-                        .toISO() as string;
-                }
-
-                return acc;
-            },
-            'PT0H0M'
-        );
-
-        return Duration.fromISO(isoTotalHours);
-    }, [todayHoursToWork]);
-
-    const totalWorkedHours = useMemo(() => {
-        const tempPunches = punches[today.toISODate()] || [];
-
-        const startTimes = tempPunches
-            .filter((_, index) => index % 2 === 0)
-            .map(
-                (punch) =>
-                    DateTime.fromSQL(
-                        `${today.toSQLDate()} ${punch.time}`
-                    ) as DateTime<true>
-            );
-
-        const endTimes = tempPunches
-            .filter((_, index) => index % 2 === 1)
-            .map(
-                (punch) =>
-                    DateTime.fromSQL(
-                        `${today.toSQLDate()} ${punch.time}`
-                    ) as DateTime<true>
-            );
-
-        if (startTimes.length !== endTimes.length) {
-            endTimes.push(today);
-        }
-
-        const workedDurations = endTimes.map(
-            (end, index) =>
-                end.diff(startTimes[index]).rescale() as Duration<true>
-        );
-
-        const total = workedDurations.reduce((acc, value) => {
-            return Duration.fromISO(acc)
-                .plus(value)
-                .rescale()
-                .toISO() as string;
-        }, 'PT0H0M');
-
-        return Duration.fromISO(total);
-    }, [today, punches]);
-
-    const totalOvertime = useMemo(() => {
-        return totalWorkedHours.minus(totalHoursToWork).rescale();
-    }, [todayHoursToWork, totalWorkedHours]);
 
     const haveSomePunch = useMemo(() => {
         return todayPunches.some((punch: Punch) => {
@@ -194,7 +140,7 @@ export default function TabOneScreen() {
             case 1:
             case 3:
                 return LogOut;
-            case todayHoursToWork.punches.length:
+            case configuredWorkShift.punches.length:
                 return CheckCheck;
             default:
                 return LogIn;
@@ -347,13 +293,13 @@ export default function TabOneScreen() {
                             <TimeEntry.Text>
                                 <TimeEntry.Label>Worked</TimeEntry.Label>
                                 <TimeEntry.Time>
-                                    {totalOvertime > Duration.fromISO('PT0S')
-                                        ? totalHoursToWork.toFormat('hh:mm')
-                                        : totalWorkedHours.toFormat('hh:mm')}
+                                    {hasOvertime
+                                        ? hoursToBeWorked.toFormat('hh:mm')
+                                        : hoursWorked.toFormat('hh:mm')}
                                 </TimeEntry.Time>
                             </TimeEntry.Text>
                         </TimeEntry>
-                        {totalOvertime > Duration.fromISO('PT0S') && (
+                        {hasOvertime && (
                             <TimeEntry gap="$3">
                                 <TimeEntry.Icon>
                                     <Plus size="$1" />
@@ -361,7 +307,7 @@ export default function TabOneScreen() {
                                 <TimeEntry.Text>
                                     <TimeEntry.Label>Overtime</TimeEntry.Label>
                                     <TimeEntry.Time>
-                                        {totalOvertime.toFormat('hh:mm')}
+                                        {overtimeWorked.toFormat('hh:mm')}
                                     </TimeEntry.Time>
                                 </TimeEntry.Text>
                             </TimeEntry>

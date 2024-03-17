@@ -1,14 +1,13 @@
 import { useAppCalendar } from '@/providers/calendar';
-import { useConfig } from '@/providers/config';
-import { usePunchStore } from '@/providers/punches';
+import { usePunchCalculation } from '@/providers/punch-calculation';
 import {
     Calendar,
-    type CalendarItemDayWithContainerProps,
-    type CalendarProps,
     activeDateRangesEmitter,
     useOptimizedDayMetadata,
+    type CalendarItemDayWithContainerProps,
+    type CalendarProps,
 } from '@marceloterreiro/flash-calendar';
-import { DateTime, Duration } from 'luxon';
+import { DateTime } from 'luxon';
 import { memo, useEffect, useMemo } from 'react';
 import { Text } from 'tamagui';
 
@@ -111,96 +110,12 @@ const PunchesCalendarItemDayWithContainer = ({
 }: CalendarItemDayWithContainerProps) => {
     const metadata = useOptimizedDayMetadata(baseMetadata);
 
-    const { config } = useConfig();
-    const { punches } = usePunchStore();
-
     const date = useMemo(() => {
         return DateTime.fromJSDate(metadata.date) as DateTime<true>;
     }, [metadata.id]);
 
-    const todayHoursToWork = useMemo(() => {
-        return config.hoursToWork[date.weekday];
-    }, [JSON.stringify(config), date.toISODate()]);
-
-    const totalHoursToWork = useMemo(() => {
-        const isoTotalHours = todayHoursToWork.durations.reduce(
-            (acc, value, index) => {
-                if (index % 2 === 0) {
-                    return Duration.fromISO(acc)
-                        .plus(Duration.fromISO(value))
-                        .rescale()
-                        .toISO() as string;
-                }
-
-                return acc;
-            },
-            'PT0H0M'
-        );
-
-        return Duration.fromISO(isoTotalHours);
-    }, [todayHoursToWork]);
-
-    const totalWorkedHours = useMemo(() => {
-        const tempPunches = punches[date.toISODate()] || [];
-
-        const startTimes = tempPunches
-            .filter((_, index) => index % 2 === 0)
-            .map(
-                (punch) =>
-                    DateTime.fromSQL(
-                        `${date.toSQLDate()} ${punch.time}`
-                    ) as DateTime<true>
-            );
-
-        const endTimes = tempPunches
-            .filter((_, index) => index % 2 === 1)
-            .map(
-                (punch) =>
-                    DateTime.fromSQL(
-                        `${date.toSQLDate()} ${punch.time}`
-                    ) as DateTime<true>
-            );
-
-        const workedDurations = endTimes.map(
-            (end, index) =>
-                end.diff(startTimes[index]).rescale() as Duration<true>
-        );
-
-        const total = workedDurations.reduce((acc, value) => {
-            return Duration.fromISO(acc)
-                .plus(value)
-                .rescale()
-                .toISO() as string;
-        }, 'PT0H0M');
-
-        return Duration.fromISO(total);
-    }, [date, punches]);
-
-    const totalOvertime = useMemo(() => {
-        return totalWorkedHours.minus(totalHoursToWork).rescale();
-    }, [todayHoursToWork, totalWorkedHours]);
-
-    const hasInconsistentPunches = useMemo(() => {
-        if (date.hasSame(DateTime.now(), 'day')) {
-            return false;
-        }
-
-        if (
-            punches[date.toSQLDate()] &&
-            !punches[date.toSQLDate()].every(
-                (punch) => punch.type === 'punch'
-            ) &&
-            punches[date.toSQLDate()].length !== todayHoursToWork.punches.length
-        ) {
-            return true;
-        }
-
-        return false;
-    }, [totalHoursToWork, punches]);
-
-    const hasOvertime = useMemo(() => {
-        return totalOvertime.toMillis() > 0;
-    }, [totalOvertime]);
+    const { hasInconsistency, hasUnworkedTime, hasOvertime, overtimeWorked } =
+        usePunchCalculation({ date });
 
     return (
         <Calendar.Item.Day.Container
@@ -222,7 +137,19 @@ const PunchesCalendarItemDayWithContainer = ({
             >
                 {children}
                 <Text fontSize={10}>{'\n'}</Text>
-                {hasInconsistentPunches && (
+                {hasInconsistency && hasUnworkedTime && (
+                    <Text
+                        fontSize={10}
+                        fontFamily="$tabular"
+                        themeInverse={
+                            metadata.state === 'active' ? true : false
+                        }
+                        color="$orange10"
+                    >
+                        -{overtimeWorked.negate().rescale().toFormat('h:mm')}
+                    </Text>
+                )}
+                {hasInconsistency && !hasUnworkedTime && (
                     <Text
                         fontSize={10}
                         fontFamily="$tabular"
@@ -234,7 +161,7 @@ const PunchesCalendarItemDayWithContainer = ({
                         check
                     </Text>
                 )}
-                {!hasInconsistentPunches && hasOvertime && (
+                {!hasInconsistency && hasOvertime && (
                     <Text
                         fontSize={10}
                         fontFamily="$tabular"
@@ -243,7 +170,7 @@ const PunchesCalendarItemDayWithContainer = ({
                         }
                         color={metadata.isDisabled ? '$gray8' : '$gray11'}
                     >
-                        {totalOvertime.toFormat('hh:mm')}
+                        {overtimeWorked.toFormat('h:mm')}
                     </Text>
                 )}
             </Calendar.Item.Day>
