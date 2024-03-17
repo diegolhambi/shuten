@@ -72,5 +72,10 @@
     "patch-package": "^8.0.0",
     "postinstall": "^0.9.0"
   },
-  "private": true
+  "private": true,
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "core-js",
+    "postinstall"
+  ]
 }
