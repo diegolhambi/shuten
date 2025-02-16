@@ -273,7 +273,7 @@ const defaultHeaders: RawAxiosRequestHeaders = {
 
 const client = axios.create({
     withCredentials: true,
-    baseURL: 'https://expert.brasil.adp.com/expert/api/',
+    baseURL: 'https://expert.cloud.brasil.adp.com/expert2/api/',
     headers: defaultHeaders,
     timeout: 3000,
 });
@@ -302,8 +302,8 @@ function loggedHeaders(sessionId: string): RawAxiosRequestHeaders {
     return {
         ...defaultHeaders,
         Newexpert_sessionid: sessionId,
-        Origin: 'https://expert.brasil.adp.com',
-        Referer: 'https://expert.brasil.adp.com/expert/v4/?lp=true',
+        Origin: 'https://expert.cloud.brasil.adp.com',
+        Referer: 'https://expert.cloud.brasil.adp.com/expert2/v4/?lp=true',
     };
 }
 
@@ -330,15 +330,15 @@ async function login(user: string, password: string): Promise<LoginResult> {
     try {
         // o retorno daqui talvez possa indicar se precisa mudar de senha
         // loginform.fcc 302 >
-        // GET https://expert.brasil.adp.com/redirect/findway/ 302 >
-        // GET https://expert.brasil.adp.com/expert/ 302 >
-        // GET https://expert.brasil.adp.com/expert/v4/?lp=true 200
+        // GET https://expert.cloud.brasil.adp.com/redirect/findway/ 302 >
+        // GET https://expert.cloud.brasil.adp.com/expert2/ 302 >
+        // GET https://expert.cloud.brasil.adp.com/expert2/v4/?lp=true 200
         let htmlLogin = await client.post<string>(
-            'https://expert.brasil.adp.com/ipclogin/1/loginform.fcc',
+            'https://expert.cloud.brasil.adp.com/ipclogin/1/loginform.fcc',
             qs.stringify({
                 USER: user,
                 PASSWORD: password,
-                TARGET: '-SM-https%3A%2F%2Fexpert.brasil.adp.com%2Fredirect%2Ffindway%2F',
+                TARGET: '-SM-https%3A%2F%2Fexpert.cloud.brasil.adp.com%2Fredirect%2Ffindway%2F',
             })
         );
         /*
@@ -383,8 +383,9 @@ async function login(user: string, password: string): Promise<LoginResult> {
             client.defaults.headers.common = {
                 ...defaultHeaders,
                 Newexpert_sessionid: sessionId,
-                Origin: 'https://expert.brasil.adp.com',
-                Referer: 'https://expert.brasil.adp.com/expert/v4/?lp=true',
+                Origin: 'https://expert.cloud.brasil.adp.com',
+                Referer:
+                    'https://expert.cloud.brasil.adp.com/expert2/v4/?lp=true',
             };
 
             client.defaults.params = {
