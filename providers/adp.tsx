@@ -338,7 +338,7 @@ async function login(user: string, password: string): Promise<LoginResult> {
             qs.stringify({
                 USER: user,
                 PASSWORD: password,
-                TARGET: '-SM-https%3A%2F%2Fexpert.cloud.brasil.adp.com%2Fredirect%2Ffindway%2F',
+                TARGET: '-SM-http%3a%2f%2fexpert%2ecloud%2ebrasil%2eadp%2ecom%2fexpert2%2f',
             })
         );
         /*
